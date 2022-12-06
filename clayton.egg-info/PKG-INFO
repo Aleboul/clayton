@@ -1,0 +1,39 @@
+Metadata-Version: 2.1
+Name: clayton
+Version: 1.0.0
+Summary: Sample from copula
+Home-page: https://github.com/Aleboul/computo
+Download-URL: https://github.com/Aleboul/clayton/
+Author: Alexis Boulin
+Author-email: aboulin@unice.fr
+License: UNKNOWN
+Platform: UNKNOWN
+
+# COPPY
+
+Random generation of copulas with Python
+----------------------------------------
+
+**COPPY** is a Python module to simulate copula.
+
+Installation
+------------
+
+Dependencies
+~~~~~~~~~~~~
+
+COPPY requires :
+
+- Python (>= 3.7)
+- NumPY (>= 1.14.6)
+- SciPY (>= 1.1.0)
+
+Source code
+~~~~~~~~~~~
+
+You can check the latest sources with the command::
+
+  git clone https://github.com/Aleboul/COPPY/
+
+
+

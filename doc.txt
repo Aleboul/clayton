@@ -1,0 +1,6 @@
+git init
+git add .
+git commit -m "revision"
+git branch -M main (ou master)
+git remote add origin https://github.com/Aleboul/clayton.git
+git push -u origin main
