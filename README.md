@@ -11,7 +11,7 @@ The module clayton is implemented using the object-oriented features of the Pyth
 Installation
 ------------
 
-# Dependencies
+## Dependencies
 
 COPPY requires :
 
@@ -19,12 +19,13 @@ COPPY requires :
 - NumPY (>= 1.14.6)
 - SciPY (>= 1.1.0)
 
-# Source Code
+## Source Code
 
 You can check the latest sources with the command::
 
   git clone https://github.com/Aleboul/COPPY/
 
-# Examples
+Examples
+--------
 
 [Graphical Representations](https://github.com/Aleboul/clayton/blob/master/examples/sample.ipynb)
