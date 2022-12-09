@@ -22,7 +22,7 @@ COPPY requires :
 
 You can check the latest sources with the command::
 
-  git clone https://github.com/Aleboul/COPPY/
+  git clone https://github.com/Aleboul/clayton/
 
 ## Examples
 
