@@ -58,79 +58,75 @@ class Multivariate:
     as a unique entry point for the multivariate copulas classes.
     It permit also to compute the variance of the w-madogram for a given point.
 
-    Attributes
+    Parameters
     ----------
-        copula_type(CopulaTypes)   : see CopulaTypes class.
-        dim(int)                   : dimension.
-        theta_interval(list[float]): interval of valid theta for the given copula family
-        invalid_thetas(list[float]): values, that even though they belong to
-                                      :attr: `theta_interval`, shouldn't be considered as valid.
-        theta(list[float])         : parameter for the parametric copula
-        var_mado(list[float])      : value of the theoretical variance for a given
-                                     point in the simplex
-        sigmat                     : covariance matrix (only for elliptical, Husler-Reiss).
-        asy(list[float])           : asymmetry for the Asy. Log. model.
-        psi1, psi2(float)          : asymmetry for the Asy. Log. model when dim = 2.
+        copula_type(CopulaTypes):
+            see CopulaTypes class.
+        n_sample(int):
+            sample size.
+        dim(int):
+            dimension.
+        theta_interval(list[float]):
+            interval of valid theta for the given copula family.
+        invalid_thetas(list[float]):
+            values, that even though they belong to
+            :attr: `theta_interval`, shouldn't be considered as valid.
+        theta(list[float]):
+            parameter for the parametric copula.
+        sigmat(ndarray of shape (dim,dim)):
+            covariance matrix (only for elliptical, Husler-Reiss).
+        asy(list[float]):
+            asymmetry coefficients for the Asy. Log. model.
+        psi1, psi2(float):
+            supplementary coefficients for AsyMix, AsyNegLog, TEV.
 
     Methods
     -------
-        sample(np.array([float])): array of shape n_sample x dim of the desired
-                                   multivariate copula model where the margins are
-                                   inverted by the specified generalized inverse
-                                   of a cdf.
+        sample(ndarray of shape (n_sampple, dim)):
+            random number generated with desired margins.
     """
-    copula_type = None
-    theta_interval = []
-    invalid_thetas = []
-    n_sample = []
-    psi1 = 0.0
-    psi2 = []
-    asy = []
-    theta = []
-    dim = None
-    sigmat = None
-
-    def __init__(self, theta=None, n_sample=None, asy=None,
-                 psi1=0.0, psi2=None, dim=2, sigmat=None):
+    @abc.abstractmethod
+    def __init__(
+            self,
+            n_sample=1,
+            dim=2,
+    ):
         """Initialize Multivariate object.
 
-        Inputs
+        Parameters
         ------
-            copula_type (copula_type or st) : subtype of the copula
-            theta (list[float] or None)     : list of parameters for the parametric copula
-            asy (list[float] or None)       : list of asymetric values for the copula
-            n_sample (int or None)          : number of sampled observation
-            dim (int or None)                 : dimension
+            copula_type (copula_type or st):
+                subtype of the copula
+            n_sample (int or None):
+                number of sampled observation.
+            dim (int or None):
+                dimension.
         """
-        self.theta = theta
-        self.n_sample = n_sample
-        self.asy = asy
-        self.psi1 = psi1
-        self.psi2 = psi2
-        self.dim = dim
-        self.sigmat = sigmat
 
-    @abc.abstractmethod
+        if (n_sample is None or
+                (isinstance(n_sample, int) and n_sample > 0)):
+            self.n_sample = n_sample
+        else:
+            message = "The inserted sample's size value {} \
+                     should be a positive integer"
+            raise ValueError(message.format(n_sample))
+
+        if (dim is None or
+                (isinstance(dim, int) and dim > 0)):
+            self.dim = dim
+        else:
+            message = "The inserted dimension value {} \
+                 should be a positive integer"
+            raise ValueError(message.format(n_sample))
+
     def child_method(self):
-        """abstract method
+        """abstract method.
         """
 
     def sample_unimargin(self):
-        """see the corresponding documentation in lower subclasses
+        """see the corresponding documentation in lower subclasses.
         """
         return self.child_method()
-
-    def check_theta(self):
-        """Validate the theta inserted.
-
-        Raises
-        ------
-            ValueError : If there is not in :attr:`theta_interval` or is in :attr:`invalid_thetas`.
-        """
-        lower, upper = self.theta_interval
-        if (not lower <= self.theta <= upper) or (self.theta in self.invalid_thetas):
-            message = "The inserted theta value {} is out of limits for the given {} copula."
-            raise ValueError(message.format(self.theta, self.copula_type.name))
 
     def _generate_randomness(self):
         """Generate a bivariate sample draw identically and
@@ -138,9 +134,9 @@ class Multivariate:
 
         Output
         ------
-            output(np.array([float]) shape n_sample x 2): a n_sample x 2 array with each
-                                                          component sampled from the desired
-                                                          copula under the unit interval.
+            output(ndarray with shape (n_sample x 2)):
+                a n_sample x 2 array with each component sampled from the desired
+                copula under the unit interval.
         """
         v_1 = np.random.uniform(low=0.0, high=1.0, size=self.n_sample)
         v_2 = np.random.uniform(low=0.0, high=1.0, size=self.n_sample)
@@ -149,16 +145,16 @@ class Multivariate:
 
     def sample(self, inv_cdf):
         """Draws a bivariate sample the desired copula and invert it by
-        a given generalized inverse of cumulative distribution function
+        a given generalized inverse of cumulative distribution function.
 
         Inputs
         ------
-            inv_cdf : generalized inverse of cumulative distribution function
+            inv_cdf: generalized inverse of cumulative distribution function.
 
         Output
         ------
-            output (np.array([float]) with sape n_sample x dim) : sample where the margins
-                                                                are specified inv_cdf.
+            output(ndarray with shape (n_sample, dim)):
+                sample where the margins are specified inv_cdf.
         """
         if isinstance(inv_cdf, list) is False:
             message = "inv_cdf should be a list"
@@ -172,7 +168,7 @@ class Multivariate:
             raise ValueError(message.format(self.dim))
         sample_ = self.sample_unimargin()
         output = np.array([inv_cdf[j](sample_[:, j])
-                          for j in range(0, self.dim)])
+                           for j in range(0, self.dim)])
         output = np.ravel(output).reshape(self.n_sample, self.dim, order='F')
         return output
 
@@ -181,11 +177,65 @@ class Archimedean(Multivariate):
     """Base class for multivariate archimedean copulas.
     This class allowd to use methods which use the generator function.
 
-    Methods
-    -------
-        sample_uni (np.array([float])) : sample form the multivariate archimedean copula.
-                                         Margins are uniform on [0,1].
+    Args:
+        Multivariate (object):
+            see Multivariate object.
     """
+    copula_type = None
+    theta_interval = None
+    invalid_thetas = None
+    theta = None
+
+    def __init__(
+            self,
+            theta=None,
+            n_sample=1,
+            dim=2
+    ):
+        """Instantiate the Archimedean object
+
+        Args:
+            theta (float):
+                parameter of the archimedean copula.
+            n_sample (int):
+                sample size.
+            dim (int):
+                dimension.
+
+        Raises:
+            ValueError:
+                If there is not in :attr:`theta_interval` or
+                is in :attr:`invalid_thetas`.
+        """
+        super().__init__(
+            dim=dim,
+            n_sample=n_sample
+        )
+        self.theta = theta
+        if self.theta is not None:
+            self.check_param()
+
+    def check_param(self):
+        """Check if the parameter set by the user is correct.
+
+        Raises:
+            TypeError:
+                If there is not in :attr:`theta_interval` or
+                is in :attr:`invalid_thetas`.
+        """
+        theta_cop = [CopulaTypes.GUMBEL,
+                     CopulaTypes.CLAYTON, CopulaTypes.FRANK, CopulaTypes.AMH,
+                     CopulaTypes.JOE, CopulaTypes.NELSEN9, CopulaTypes.NELSEN10,
+                     CopulaTypes.NELSEN11, CopulaTypes.NELSEN12, CopulaTypes.NELSEN13,
+                     CopulaTypes.NELSEN14, CopulaTypes.NELSEN15, CopulaTypes.NELSEN22]
+        if self.theta is not None and self.copula_type in theta_cop:
+            lower, upper = self.theta_interval
+            if ((self.theta < lower) | (self.theta > upper) or
+                    (self.theta in self.invalid_thetas)):
+                message = "The inserted theta value {} is out of limits for the \
+                    given {} copula."
+                raise TypeError(message.format(
+                    self.theta, self.copula_type.name))
 
     @abc.abstractmethod
     def child_method(self):
@@ -215,6 +265,14 @@ class Archimedean(Multivariate):
     def _c(self, var):
         """Return the value of the copula taken on (u,v)
         .. math:: C(u,v) = phi^leftarrow (phi(u) + phi(v)), 0<u,v<1
+
+        Args:
+            var (ndarray of shape (, dim)):
+                a real where to evaluate the copula function.
+
+        Returns:
+            real:
+            the value of the copula function evaluate on var.
         """
         value_ = self._generator_inv(np.sum(self._generator(var)))
         return value_
@@ -223,18 +281,15 @@ class Archimedean(Multivariate):
         """Perform conditional simulation. Only useful for Archimedean copulas
         where the frailty distribution is still unknown.
 
-        CopulaTypes
-        -----------
-            NELSEN9
-            NELSEN10
-            NELSEN11
-            NELSEN12
-            NELSEN13
-            NELSEN14
-            NELSEN15
-            NELSEN22
+        Raises:
+            ValueError:
+                if dim > 2.
+
+        Returns:
+            ndarray of shape (n_sample, 2):
+                random numbers generated through conditional simulation.
         """
-        self.check_theta()
+
         if self.dim == 2:
             output = np.zeros((self.n_sample, self.dim))
         else:
@@ -254,7 +309,7 @@ class Archimedean(Multivariate):
             else:
                 sol = brentq(func, EPSILON, 1-EPSILON)
             vectu = [self._generator_inv(vectv[0] * self._generator(sol)),
-                self._generator_inv((1-vectv[0])*self._generator(sol))]
+                     self._generator_inv((1-vectv[0])*self._generator(sol))]
             output[i, :] = vectu
         return output
 
@@ -262,19 +317,22 @@ class Archimedean(Multivariate):
         """Sample from Archimedean copula using algorithm where the frailty
         distribution is known.
 
-        CopulaTypes
-        -----------
-            CLAYTON
-            AMH
-            JOE
-            FRANK
+        Raises:
+            ValueError:
+                if self.theta is negative
+
+        Returns:
+            ndarray of shape (n_sample, dim):
+                random numbers generated through frailty simulation.
         """
+
         if self.dim > 2:
             if self.theta < 0:
-                message = "The inserted theta value {} is out of limits for the given {} copula. In dimension greater than 2, positive association are only allowed."
+                message = "The inserted theta value {} is out of limits for \
+                    the given {} copula. In dimension greater than 2, positive \
+                        association are only allowed."
                 raise ValueError(message.format(
                     self.theta, self.copula_type.name))
-        self.check_theta()
         output = np.zeros((self.n_sample, self.dim))
         for i in range(0, self.n_sample):
             samplegamma = np.random.gamma(1, 1, self.dim)
@@ -288,16 +346,11 @@ class Archimedean(Multivariate):
         Performs different algorithm if the frailty distribution of the
         chosen Archimedean copula is known or not.
 
-        Output
-        ------
-            output (np.array([float]) with shape n_sample x dim) : sample from the desired
-                                                                 copula with uniform margins.
-
-        RaiseValueError
-        ---------------
-            generator function can't generate Archimedean copula for dim > 2
-
+        Returns:
+            ndarray of shape (n_sample, dim):
+                random numbers generated with uniform margins.
         """
+
         output = []
         condsim_numbers = [CopulaTypes.NELSEN9, CopulaTypes.NELSEN10, CopulaTypes.NELSEN11,
                            CopulaTypes.NELSEN12, CopulaTypes.NELSEN13, CopulaTypes.NELSEN14,
@@ -318,27 +371,17 @@ class Extreme(Multivariate):
     """Base class for multivariate extreme value copulas.
     This class allows to use methods which use the Pickands dependence function.
 
-    Methods
-    -------
-        sample_uni (np.array([float])) : sample from the desired multivariate copula model.
-                                         Margins are uniform on [0,1].
-        var_FMado (float)              : gives the asymptotic variance of w-madogram for a
-                                         multivariate extreme value copula.
-
-    Examples
-    --------
-        >>> import base
-        >>> import mv_evd
-        >>> import matplotlib.pyplot as plt
-
-        >>> copula = mv_evd.Logistic(theta = 0.5, dim = 3, n_sample = 1024)
-        >>> sample = copula.sample_uni()
-
-        >>> fig = plt.figure()
-        >>> ax = fig.add_subplot(111, projection = '3d')
-        >>> ax.scatter3D(sample[:,0],sample[:,1],sample[:,2], c = 'lightblue', s = 1.0, alpha = 0.5)
-        >>> plt.show()
+    Args:
+        Multivariate (object):
+            see Multivariate object
     """
+
+    copula_type = None
+    theta = None
+    psi1 = None
+    psi2 = None
+    sigmat = None
+    asy = None
 
     @abc.abstractmethod
     def child_method(self):
@@ -384,10 +427,15 @@ class Extreme(Multivariate):
         """Return the value of the stable tail dependence function on u.
         Pickands is parametrize as A(w_0, dots, w_{d-1}) with w_0 = 1-sum_{j=1}^{d-1} w_j
 
-        Inputs
-        ------
-            u (list[float]) : dim-list with each components between 0 and 1.
+        Args:
+            var (list or ndarray):
+                vector
+
+        Returns:
+            real:
+                stable tail dependence function evaluated at var.
         """
+
         sumu = np.sum(var)
         vectw = var / sumu
         value_ = sumu*self._pickands(vectw)
@@ -397,10 +445,14 @@ class Extreme(Multivariate):
         """Return the value of the copula taken on u
         .. math:: C(u) = exp(-l(-log(u_1), dots, -log(u_d))), u in [0,1]^d.
 
-        Inputs
-        ------
-            u (list[float]) : dim-list of float between 0 and 1.
+        Args:
+            var (list or ndarray):
+                vector.
+        Returns:
+            real:
+                extreme value copula evaluated at var.
         """
+
         log_u_ = np.log(var)
         value_ = math.exp(-self._l(-log_u_))
         return value_
@@ -409,11 +461,17 @@ class Extreme(Multivariate):
         """Return the value of the jth partial derivative of l.
         ..math:: dot{l}_j(u), u in ]0,1[^d, j in {0,dots,d-1}.
 
-        Inputs
-        ------
-            var (list[float]) : list of float between 0 and 1.
-            j (int)         : jth derivative of the stable tail dependence function.
+        Args:
+            var (list or ndarray):
+                list of float between 0 and 1.
+            j (int):
+                jth derivative of the stable tail dependence function.
+
+        Returns:
+            real:
+                value of the jth partial derivative of l at var.
         """
+
         sumu = np.sum(var)
         vectw = var / sumu
         if j == 0:
@@ -434,23 +492,37 @@ class Extreme(Multivariate):
             value_ = self._pickands(vectw) - np.sum(deriv_)
         return value_
 
-    def _dot_c(self, arg, j):
+    def _dot_c(self, var, j):
         """Return the value of dot{C}_j taken on u.
         .. math:: dot{C}_j = C(u)/u_j * _mu_j(u), u in [0,1]^d, j in {0 , dots, d-1}.
+
+        Args:
+            var (list or ndarray):
+                list of float between 0 and 1.
+            j (int):
+                jth derivative of the stable tail dependence function.
+
+        Returns:
+            real:
+                value of dot{C}_j taken on var.
         """
-        value_ = (self._c(arg) / arg[j]) * self._mu(-np.log(arg), j)
+
+        value_ = (self._c(var) / var[j]) * self._mu(-np.log(var), j)
         return value_
 
     def _cond_sim(self):
         """Draw a bivariate sample from an extreme value copula using conditional simulation.
         Margins are uniform.
 
-        CopulaTypes
-        -----------
-            ASYMMETRIC_MIXED
-            ASYMMETRIC_NEGATIVE_LOGISTIC
+        Raises:
+            ValueError:
+                if dim > 2.
+
+        Returns:
+            ndarray with shape (n_sample,2):
+                random numbers generated from conditional simulation.
         """
-        self.check_theta()
+
         if self.dim > 2:
             message = "The dimension {} inserted is not compatible with {}."
             raise ValueError(message.format(self.dim, self.copula_type.name))
@@ -469,15 +541,15 @@ class Extreme(Multivariate):
         return output
 
     def _ext_sim(self):
-        """ Multivariate extreme value distribution sampling algorithm via extremal functions.
-        See Dombry et al [2016], exact simulation of max-stable process for more details.
+        """Multivariate extreme value distribution sampling algorithm via extremal
+        functions. See Dombry et al [2016], exact simulation of max-stable process
+        for more details.
 
-        CopulaTypes
-        -----------
-            HUSLER_REISS
-            TEV
-            DIRICHLET
+        Returns:
+            ndarray with shape (n_sample,dim):
+                random numbers generated from extremal functions.
         """
+
         if self.copula_type == CopulaTypes.TEV:
             stdev = np.exp(0.5 * np.log(np.diag(self.sigmat)))
             stdevmat = np.linalg.inv(np.diag(stdev))
@@ -520,23 +592,18 @@ class Extreme(Multivariate):
         return output
 
     def sample_unimargin(self):
-        """Sample from EV copula with uniform margins.
+        """Sample from extreme value copula with uniform margins.
         Performs different algorithms if a fast random number generator
         is known.
 
-        Output
-        ------
-            output (np.array([float]) with shape n_sample x dim) : sample from the desired
-                                                                 copula with uniform margins.
-
-        RaiseValueError
-        ---------------
-            generator function can't generate Archimedean copula for dim > 2
+        Returns:
+            ndarray with shape (n_sample, dim):
+                sample with uniform margins.
         """
+
         output = []
         condsim_numbers = [CopulaTypes.ASYMMETRIC_NEGATIVE_LOGISTIC,
-                           CopulaTypes.ASYMMETRIC_MIXED_MODEL,
-                           CopulaTypes.ASYMMETRIC_NEGATIVE_LOGISTIC]
+                           CopulaTypes.ASYMMETRIC_MIXED_MODEL]
         extsim_numbers = [CopulaTypes.HUSLER_REISS,
                           CopulaTypes.TEV, CopulaTypes.DIRICHLET, CopulaTypes.BILOG]
         if self.copula_type in condsim_numbers:
@@ -559,7 +626,15 @@ class Extreme(Multivariate):
 
 
 def frechet(var):
+    """Probability distribution function for Frechet's law
+
+    Args:
+        var (real):
+            a real.
+
+    Returns:
+        real:
+            ..math.. exp{-1/x}
     """
-        Probability distribution function for Frechet's law
-    """
+
     return np.exp(-1/var)

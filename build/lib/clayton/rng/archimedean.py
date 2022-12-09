@@ -42,7 +42,7 @@ class Clayton(Archimedean):
         return np.random.gamma(1/self.theta, 1, 1)
 
 
-class Frank(Archimedean):  
+class Frank(Archimedean):
     """Class for a frank copula model"""
 
     copula_type = CopulaTypes.FRANK

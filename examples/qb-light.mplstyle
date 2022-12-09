@@ -1,0 +1,30 @@
+### FONT
+text.color : 8A8A8C
+
+### AXES
+axes.facecolor      : ECECEF   # change la couleur des faces
+axes.edgecolor      : white   # change la couleur des axes
+axes.labelcolor     : 0F0F0F   # change la couleur des labels
+
+### TICKS
+xtick.color          : 8A8A8C      # change la couleur des petits traits en x
+ytick.color          : 8A8A8C      # change la couleur des petits traits en y
+
+### GRIDS
+axes.grid        :   True     # Met une grille si vrai
+grid.color       :   F7F7F8   # Change la couleur de la grille
+grid.linestyle   :   -        # 
+
+### Legend
+legend.facecolor : None   # legend background color (when 'inherit' uses axes.facecolor)
+legend.edgecolor : None # legend edge color (when 'inherit' uses axes.edgecolor)
+legend.labelcolor: 0F0F0F
+
+### FIGURE
+#figure.facecolor : 0.75    # figure facecolor; 0.75 is scalar gray
+figure.facecolor: FFFFFF
+savefig.facecolor: FFFFFF
+
+# CUSTOM
+font.sans-serif: Overpass, Helvetica, Helvetica Neue, Arial, Liberation Sans, DejaVu Sans, Bitstream Vera Sans, sans-serif
+axes.prop_cycle: cycler('color', ['999999', 'DEDEDE'])

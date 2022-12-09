@@ -4,7 +4,7 @@ elliptical copula.
 
 import numpy as np
 from scipy.stats import norm, t
-from base import Multivariate, CopulaTypes
+from .base import Multivariate, CopulaTypes
 
 
 class Gaussian(Multivariate):
