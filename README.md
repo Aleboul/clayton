@@ -1,6 +1,6 @@
 # clayton
 
-## Sampling from copulas
+## Sampling from copulae
 
 
 The modeling of dependence between random variables is an important subject in several
