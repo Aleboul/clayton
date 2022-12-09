@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>clayton.rng.base.Extreme &#8212; clayton 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="clayton.rng.archimedean" href="clayton.rng.archimedean.html" />
+    <link rel="prev" title="clayton.rng.base.Archimedean" href="clayton.rng.base.Archimedean.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="clayton-rng-base-extreme">
+<h1>clayton.rng.base.Extreme<a class="headerlink" href="#clayton-rng-base-extreme" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="clayton.rng.base.Extreme">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">clayton.rng.base.</span></span><span class="sig-name descname"><span class="pre">Extreme</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#clayton.rng.base.Extreme" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for multivariate extreme value copulas.
+This class allows to use methods which use the Pickands dependence function.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>Multivariate (object):</dt><dd><p>see Multivariate object</p>
+</dd>
+</dl>
+</dd>
+<dt>Attributes:</dt><dd><dl class="simple">
+<dt>asy (list[float], optional):</dt><dd><p>asymmetry coefficients. Defaults to None.</p>
+</dd>
+<dt>copula_type (CopulaTypes, optional):</dt><dd><p>identifier of the copula. Defaults to None.</p>
+</dd>
+<dt>psi1 (float, optional):</dt><dd><p>first coefficient of asymmetry. Defaults to None.</p>
+</dd>
+<dt>psi2 (float, optional):</dt><dd><p>second coefficient of asymmetry. Defaults to None.</p>
+</dd>
+<dt>sigmat (ndarray, optional):</dt><dd><p>ndarray with shape (dim,dim). Defaults to None.</p>
+</dd>
+<dt>theta (float, optional):</dt><dd><p>parameter of the copula. Defaults to None.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="clayton.rng.base.Extreme.__init__">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#clayton.rng.base.Extreme.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize Multivariate object.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>n_sample (int, optional):</dt><dd><p>sample size. Defaults to 1.</p>
+</dd>
+<dt>dim (int, optional):</dt><dd><p>dimension. Defaults to 2.</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>ValueError:</dt><dd><p>sample size is not a positive integer.</p>
+</dd>
+<dt>ValueError:</dt><dd><p>dimension is not a positive integer.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#clayton.rng.base.Extreme.__init__" title="clayton.rng.base.Extreme.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([n_sample, dim])</p></td>
+<td><p>Initialize Multivariate object.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample</span></code>(inv_cdf)</p></td>
+<td><p>Draws a bivariate sample the desired copula and invert it by a given generalized inverse of cumulative distribution function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_unimargin</span></code>()</p></td>
+<td><p>Sample from extreme value copula with uniform margins.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">asy</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copula_type</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi1</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi2</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sigmat</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">theta</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">clayton</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#base">Base</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="clayton.rng.base.html">clayton.rng.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clayton.rng.base.Multivariate.html">clayton.rng.base.Multivariate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clayton.rng.base.Archimedean.html">clayton.rng.base.Archimedean</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">clayton.rng.base.Extreme</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#archimedean">Archimedean</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#extreme">Extreme</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">Documentation</a><ul>
+      <li>Previous: <a href="clayton.rng.base.Archimedean.html" title="previous chapter">clayton.rng.base.Archimedean</a></li>
+      <li>Next: <a href="clayton.rng.archimedean.html" title="next chapter">clayton.rng.archimedean</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexis Boulin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/generated/clayton.rng.base.Extreme.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

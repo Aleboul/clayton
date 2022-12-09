@@ -1,25 +1,32 @@
-"""Multivariate extreme value copula module contains methods for sampling from a multivariate
-extreme value copula and to compute the asymptotic variance of the w-madogram under missing or
-complete data.
+"""Multivariate extreme value copula or, more generally, extreme value distribution
+are max-stable random vector with generalized extreme value margins and we may write
 
-Multivariate extreme value copulas are characterized by their stable tail dependence function
-which the restriction to the unit simplex gives the Pickands dependence function. The copula
-function
+.. math:: \mathbb{P}\{ \mathbf{X} \leq \mathbf{x} \} 
+            = \exp\{-\Lambda(E \setminus [\mathbf{0}, \mathbf{x}])\},
 
-..math:: C(u) = exp{-l(-log(u_1), dots, -log(u_d))},  0 < u_j <= 1,
+where :math:`\Lambda` is a Radon measure on the cone :math:`E = [0,\infty]^d \setminus \mathbf{0}`.
+This dependendence structure can be translated with the classical notion of copula, :math:`C` 
+is an extreme value copula if
 
-is a multivariate extreme value copula. To sample from a multivariate extreme value copula, we
-implement the Algoritm 2.1 and 2.2 from Stephenson (2002).
+.. math::  C(u) = \exp\{-\ell(-\ln(u_1), \dots, -\ln(u_d))\}, 0 < u_j \leq 1,
+
+where :math:`\ell` is the stable tail dependence function.
 
 Structure :
 
-- Extreme value copula (:py:class:`Extreme`) from copy.multivariate.base.py
+- Extreme value copula (:py:class:`Extreme`) from :py:mod:`clayton.rng.base`
     - Logistic model (:py:class:`Logistic`)
-    - Asymmetric logistic model (:py:class:`Asymmetric_logistic`)
+    - Asymmetric logistic model (:py:class:`AsymmetricLogistic`)
+    - Husler Reiss (:py:class:`HuslerReiss`)
+    - Asymmetric negative logistic (:py:class:`AsyNegLog`)
+    - Asymmetric mixed (:py:class:`AsyMix`)
+    - t-Extreme Value (:py:class:`TEV`)
+    - Bilogistic model (:py:class:`Bilog`)
 """
 # pylint: disable=too-few-public-methods
 
 import math
+import abc
 import numpy as np
 
 from scipy.stats import norm
@@ -49,6 +56,7 @@ class Logistic(Extreme):
     theta_interval = [0, 1]
     invalid_thetas = [0]
 
+    @abc.abstractmethod
     def __init__(
         self,
         theta=None,
@@ -76,9 +84,9 @@ class Logistic(Extreme):
         )
         self.theta = theta
         if self.theta is not None:
-            self.check_param()
+            self._check_param()
 
-    def check_param(self):
+    def _check_param(self):
         """Check if the parameter set by the user is correct.
 
         Raises:
@@ -135,7 +143,7 @@ class Logistic(Extreme):
         value_ = self.theta * value_1 * value_2
         return value_
 
-    def rmvlog_tawn(self):
+    def _rmvlog_tawn(self):
         """Algorithm 2.1 of Stephenson (2002).
 
         Returns:
@@ -159,7 +167,7 @@ class Logistic(Extreme):
                 Logistic dependence with uniform margins.
         """
 
-        sim = frechet(self.rmvlog_tawn())
+        sim = _frechet(self._rmvlog_tawn())
         return sim.reshape(self.n_sample, self.dim)
 
 
@@ -184,6 +192,7 @@ class AsymmetricLogistic(Extreme):
 
     copula_type = CopulaTypes.ASYMMETRIC_LOGISTIC
 
+    @abc.abstractmethod
     def __init__(
         self,
         theta=None,
@@ -213,7 +222,7 @@ class AsymmetricLogistic(Extreme):
         numb = int(2**self.dim - 1)
         dep = np.repeat(self.theta, numb - self.dim)
         if self.asy is not None and self.theta is not None:
-            self.mvalog_check(dep)
+            self._mvalog_check(dep)
 
     def _pickands(self, var):
         """Return the value of the Pickands dependence function taken on t
@@ -231,7 +240,7 @@ class AsymmetricLogistic(Extreme):
         numb = int(2**self.dim - 1)
         dep = np.repeat(self.theta, numb - self.dim)
         dep = np.concatenate([np.repeat(1, self.dim), dep], axis=None)
-        asy = self.mvalog_check(dep)
+        asy = self._mvalog_check(dep)
         vecta = []
         for b in range(0, numb):
             x = np.power(asy[b, :], 1/dep[b])
@@ -258,7 +267,7 @@ class AsymmetricLogistic(Extreme):
         """
         numb = int(2**self.dim - 1)
         dep = np.repeat(self.theta, numb - self.dim)
-        asy = self.mvalog_check(dep)
+        asy = self._mvalog_check(dep)
         vectadot = []
         for b in range(0, numb):
             z = np.zeros(self.dim)
@@ -272,7 +281,7 @@ class AsymmetricLogistic(Extreme):
 
         return np.sum(vectadot)
 
-    def rmvalog_tawn(self, number, alpha, asy):
+    def _rmvalog_tawn(self, number, alpha, asy):
         """ Algorithm 2.2 of Stephenson (2008).
 
         Args:
@@ -312,7 +321,7 @@ class AsymmetricLogistic(Extreme):
 
         return sim
 
-    def mvalog_check(self, dep):
+    def _mvalog_check(self, dep):
         """Check value of theta and asy
 
         Args:
@@ -357,7 +366,7 @@ class AsymmetricLogistic(Extreme):
 
 
 class HuslerReiss(Extreme):
-    """Class for HuslerReiss copula model
+    """Class for Husler Reiss copula model.
 
     Args:
         Extreme (object):
@@ -374,6 +383,7 @@ class HuslerReiss(Extreme):
 
     copula_type = CopulaTypes.HUSLER_REISS
 
+    @abc.abstractmethod
     def __init__(
         self,
         sigmat=None,
@@ -397,7 +407,7 @@ class HuslerReiss(Extreme):
         )
         self.sigmat = sigmat
         if self.sigmat is not None:
-            self.check_cnsd()
+            self._check_cnsd()
 
     def _pickands(self, var):
         """Return the generator function.
@@ -443,7 +453,7 @@ class HuslerReiss(Extreme):
                                         (2*self.theta) * math.log(var[1]/var[0]))
         return - value_1 - value_2 + value_3 + value_4
 
-    def check_cnsd(self, tol=1e-08):
+    def _check_cnsd(self, tol=1e-08):
         """Is the matrix conditionally negative semi-definite?
         Function adapted from '.is.CNSD' in the mev package
 
@@ -481,7 +491,7 @@ class HuslerReiss(Extreme):
             message = "{} should be conditionally negative semi-definite"
             raise ValueError(message.format(self.sigmat))
 
-    def sigma2covar(self, index):
+    def _sigma2covar(self, index):
         """Transform positive definite covariance matrix to a
         conditionally negative definite matrix (see Engelke and Hitz, 2020 Appendix B).
 
@@ -503,7 +513,7 @@ class HuslerReiss(Extreme):
         covar = np.delete(covar, index, axis=1)
         return covar
 
-    def rextfunc(self, index, cholesky):
+    def _rextfunc(self, index, cholesky):
         """ Generate from extremal Husler-Reiss distribution Y follows P_x, where
         P_x is probability of extremal function
 
@@ -549,7 +559,8 @@ class AsyNegLog(Extreme):
     copula_type = CopulaTypes.ASYMMETRIC_NEGATIVE_LOGISTIC
     theta_interval = [1, float('inf')]
     invalid_thetas = []
-
+    
+    @abc.abstractmethod
     def __init__(
         self,
         theta=None,
@@ -564,9 +575,9 @@ class AsyNegLog(Extreme):
             theta (float, optional):
                 parameter of the copula. Defaults to None.
             psi1 (float, optional):
-                first coefficient of assymetry. Defaults to None.
+                first coefficient of asymmetry. Defaults to None.
             psi2 (float, optional):
-                second coefficient of assymetry. Defaults to None.
+                second coefficient of asymmetry. Defaults to None.
             n_sample (int, optional):
                 sample size. Defaults to 1.
             dim (int, optional):
@@ -581,9 +592,9 @@ class AsyNegLog(Extreme):
         if (self.psi1 is not None and
             self.psi2 is not None and
                 self.theta is not None):
-            self.check_param()
+            self._check_param()
 
-    def check_param(self):
+    def _check_param(self):
         """Check parameters of the asymmetric negative logistic copula model.
 
         Raises:
@@ -644,7 +655,7 @@ class AsyNegLog(Extreme):
 
 
 class AsyMix(Extreme):
-    """Class for asymmetric mixed model
+    """Class for asymmetric mixed model.
 
     Args:
         Extreme (object):
@@ -662,7 +673,8 @@ class AsyMix(Extreme):
     copula_type = CopulaTypes.ASYMMETRIC_MIXED_MODEL
     theta_interval = [0, float('inf')]
     invalid_thetas = []
-
+    
+    @abc.abstractmethod
     def __init__(
         self,
         theta=None,
@@ -690,9 +702,9 @@ class AsyMix(Extreme):
         self.theta = theta
         self.psi1 = psi1
         if self.theta is not None and self.psi1 is not None:
-            self.check_param()
+            self._check_param()
 
-    def check_param(self):
+    def _check_param(self):
         """
             Validate the parameters inserted.
             This method is used to assert if the parameters are
@@ -767,7 +779,8 @@ class TEV(Extreme):
     copula_type = CopulaTypes.TEV
     theta_interval = [-1, 1]
     invalid_thetas = []
-
+    
+    @abc.abstractmethod
     def __init__(
         self,
         sigmat=None,
@@ -796,9 +809,9 @@ class TEV(Extreme):
         self.psi1 = psi1
 
         if self.sigmat is not None and self.psi1 is not None:
-            self.check_param()
+            self._check_param()
 
-    def check_param(self):
+    def _check_param(self):
         """Check sigmat and psi1.
 
         Raises:
@@ -815,7 +828,7 @@ class TEV(Extreme):
                 message = "{} should be a squared matrix"
                 raise ValueError(message.format(self.sigmat))
 
-    def ztev(self, var):
+    def _ztev(self, var):
         """Intermediate quantity
 
         Args:
@@ -842,8 +855,8 @@ class TEV(Extreme):
             real:
                 value of the Pickands dependence function evaluated at var
         """
-        value_ = var[1]*t.cdf(self.ztev(var[1]), df=self.psi1 + 1) + \
-            (1-var[1])*t.cdf(self.ztev(var[0]), df=self.psi1 + 1)
+        value_ = var[1]*t.cdf(self._ztev(var[1]), df=self.psi1 + 1) + \
+            (1-var[1])*t.cdf(self._ztev(var[0]), df=self.psi1 + 1)
         return value_
 
     def _pickandsdot(self, var, j=0):
@@ -861,19 +874,19 @@ class TEV(Extreme):
                 value of jth partial derivative of the Pickands
                 dependence function taken on var
         """
-        value_1 = t.cdf(self.ztev(var[1]), df=self.psi1 + 1)
-        value_2 = (1/var[0]) * t.pdf(self.ztev(var[1]), df=self.psi1+1) * \
+        value_1 = t.cdf(self._ztev(var[1]), df=self.psi1 + 1)
+        value_2 = (1/var[0]) * t.pdf(self._ztev(var[1]), df=self.psi1+1) * \
             math.pow((1+self.psi1), 1/2) * \
             math.pow(1-math.pow(self.theta, 2), -1/2) * \
             math.pow(var[1]/var[0], 1/self.psi1)
-        value_3 = t.cdf(self.ztev(var[0]), df=self.psi1 + 1)
-        value_4 = (1/var[1]) * t.pdf(self.ztev(var[0]), df=self.psi1 + 1) * \
+        value_3 = t.cdf(self._ztev(var[0]), df=self.psi1 + 1)
+        value_4 = (1/var[1]) * t.pdf(self._ztev(var[0]), df=self.psi1 + 1) * \
             math.pow((1+self.psi1), 1/2) * \
             math.pow(1-math.pow(self.theta, 2), -1/2) * \
             math.pow(var[0]/var[1], 1/self.psi1)
         return value_1 + value_2 - value_3 - value_4
 
-    def sigma2covar(self, index):
+    def _sigma2covar(self, index):
         """Transform positive definite covariance matrix to a
         conditionally negative definite matrix (see Engelke and Hitz, 2020 Appendix B).
 
@@ -891,7 +904,7 @@ class TEV(Extreme):
         covar = np.delete(covar, index, axis=1)
         return covar
 
-    def rextfunc(self, index, cholesky):
+    def _rextfunc(self, index, cholesky):
         """ Generate from extremal Student-t probability of extremal function
 
         Args:
@@ -919,10 +932,11 @@ class TEV(Extreme):
 
 
 class Bilog(Extreme):
-    """ The bilogistic distribution model Smith (1990) """
+    """ Class for bilogistic distribution model Smith (1990). """
 
     copula_type = CopulaTypes.BILOG
-
+    
+    @abc.abstractmethod
     def __init__(
             self,
             theta=None,
@@ -945,9 +959,9 @@ class Bilog(Extreme):
         )
         self.theta = theta
         if self.theta is not None:
-            self.check_param()
+            self._check_param()
 
-    def check_param(self):
+    def _check_param(self):
         """Check parameter theta
 
         Raises:
@@ -963,7 +977,7 @@ class Bilog(Extreme):
     def _pickandsdot(self, var, j=0):
         raise NotImplementedError
 
-    def rextfunc(self, index, normalize=True):
+    def _rextfunc(self, index, normalize=True):
         """Random variate generation for Dirichlet distribution on S_d
         A function to sample Dirichlet random variables, based on the representation
         as ratios of Gamma.
@@ -989,8 +1003,10 @@ class Bilog(Extreme):
         return sample
 
 
-def frechet(var):
+def _frechet(var):
     """
-        Probability distribution function for Frechet's law
+        Probability distribution function for _frechet's law
     """
     return np.exp(-1/var)
+
+# aide doc https://developer.lsst.io/v/u-ktl-debug-fix/docs/rst_styleguide.html

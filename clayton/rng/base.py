@@ -1,16 +1,17 @@
-"""Base module contains method for sampling from a multivariate extreme value copula and
-to compute the asymptotic variance of the w-madogram with missing or complete data.
+"""A multivariate copula :math:`C : [0,1]^d \mapsto [0,1]` of a d-dimensional random vector :math:`\mathbf{X}`
+allows us to separate the effect of dependence from the effect of the marginal distributions such as:
 
-A multivariate copula $C : [0,1]^d \rightarrow [0,1]$ of a d-dimensional random vector $X$ allows
-us to separate the effect of dependence from the effect of the marginal distributions. The
-copula function completely chracterizes the stochastic dependence between the margins of $X$.
-Extreme value copulas are characterized by the stable tail dependence function which the restriction
-to the unit simplex is called Pickands dependence function.
+.. math:: \mathbb{P}\{ X_1 \leq x_1, \dots, X_d \leq x_d \} =
+                C( \mathbb{P}\{X_1 \leq x_1\}, \dots, \mathbb{P} \{X_d \leq x_d\}),
+
+where :math:`(x_1,\dots,x_d) \in \mathbb{R}^d`. The main consequence of this identity is that 
+the copula completely characterizes the stochastic dependence between the margins of :math:`\mathbf{X}`.
 
 Structure :
 
 - Multivariate copula (:py:class:`Multivariate`)
-    - Extreme value copula (:py:class:`Extreme`)
+    - Archimedean copula (:py:mod:`clayton.rng.archimedean`)
+    - Extreme value copula (:py:mod:`clayton.rng.evd`)
 """
 
 import math
@@ -56,35 +57,21 @@ class Multivariate:
     """Base class for multivariate copulas.
     This class allows to instantiate all its subclasses and serves
     as a unique entry point for the multivariate copulas classes.
-    It permit also to compute the variance of the w-madogram for a given point.
 
-    Parameters
-    ----------
-        copula_type(CopulaTypes):
-            see CopulaTypes class.
-        n_sample(int):
-            sample size.
-        dim(int):
-            dimension.
-        theta_interval(list[float]):
-            interval of valid theta for the given copula family.
-        invalid_thetas(list[float]):
-            values, that even though they belong to
-            :attr: `theta_interval`, shouldn't be considered as valid.
-        theta(list[float]):
-            parameter for the parametric copula.
-        sigmat(ndarray of shape (dim,dim)):
-            covariance matrix (only for elliptical, Husler-Reiss).
-        asy(list[float]):
-            asymmetry coefficients for the Asy. Log. model.
-        psi1, psi2(float):
-            supplementary coefficients for AsyMix, AsyNegLog, TEV.
+    Raises:
+        ValueError:
+            wrong sample size.
+        ValueError:
+            wrong dimension.
+        ValueError:
+            inv_cdf should be a list.
+        ValueError:
+            wrong dimension of inv_cdf.
 
-    Methods
-    -------
-        sample(ndarray of shape (n_sampple, dim)):
-            random number generated with desired margins.
+    Returns:
+        clayton.rng.base.Multivariate
     """
+
     @abc.abstractmethod
     def __init__(
             self,
@@ -93,14 +80,17 @@ class Multivariate:
     ):
         """Initialize Multivariate object.
 
-        Parameters
-        ------
-            copula_type (copula_type or st):
-                subtype of the copula
-            n_sample (int or None):
-                number of sampled observation.
-            dim (int or None):
-                dimension.
+        Args:
+            n_sample (int, optional):
+                sample size. Defaults to 1.
+            dim (int, optional):
+                dimension. Defaults to 2.
+
+        Raises:
+            ValueError:
+                sample size is not a positive integer.
+            ValueError:
+                dimension is not a positive integer.
         """
 
         if (n_sample is None or
@@ -119,24 +109,21 @@ class Multivariate:
                  should be a positive integer"
             raise ValueError(message.format(n_sample))
 
-    def child_method(self):
+    def _child_method(self):
         """abstract method.
         """
 
     def sample_unimargin(self):
         """see the corresponding documentation in lower subclasses.
         """
-        return self.child_method()
+        return self._child_method()
 
     def _generate_randomness(self):
         """Generate a bivariate sample draw identically and
         independently from a uniform over the segment [0,1].
 
-        Output
-        ------
-            output(ndarray with shape (n_sample x 2)):
-                a n_sample x 2 array with each component sampled from the desired
-                copula under the unit interval.
+        Returns:
+            ndarray of shape (n_sample, dim).
         """
         v_1 = np.random.uniform(low=0.0, high=1.0, size=self.n_sample)
         v_2 = np.random.uniform(low=0.0, high=1.0, size=self.n_sample)
@@ -147,14 +134,18 @@ class Multivariate:
         """Draws a bivariate sample the desired copula and invert it by
         a given generalized inverse of cumulative distribution function.
 
-        Inputs
-        ------
-            inv_cdf: generalized inverse of cumulative distribution function.
+        Args:
+            inv_cdf (list):
+                list of desired margins.
 
-        Output
-        ------
-            output(ndarray with shape (n_sample, dim)):
-                sample where the margins are specified inv_cdf.
+        Raises:
+            ValueError:
+                inv_cdf should be a list.
+            ValueError:
+                wrong size of inv_cdf.
+
+        Returns:
+            ndarray of shape (n_sample, dim)
         """
         if isinstance(inv_cdf, list) is False:
             message = "inv_cdf should be a list"
@@ -186,6 +177,7 @@ class Archimedean(Multivariate):
     invalid_thetas = None
     theta = None
 
+    @abc.abstractmethod
     def __init__(
             self,
             theta=None,
@@ -213,9 +205,9 @@ class Archimedean(Multivariate):
         )
         self.theta = theta
         if self.theta is not None:
-            self.check_param()
+            self._check_param()
 
-    def check_param(self):
+    def _check_param(self):
         """Check if the parameter set by the user is correct.
 
         Raises:
@@ -237,30 +229,29 @@ class Archimedean(Multivariate):
                 raise TypeError(message.format(
                     self.theta, self.copula_type.name))
 
-    @abc.abstractmethod
-    def child_method(self):
+    def _child_method(self):
         """abstract method
         """
 
     def _generator(self, var):
         """See the documentation in archimedean.py
         """
-        return self.child_method()
+        return self._child_method()
 
     def _generator_dot(self, var):
         """See the documentation in archimedean.py
         """
-        return self.child_method()
+        return self._child_method()
 
     def _generator_inv(self, var):
         """See the documentation in archimedean.py
         """
-        return self.child_method()
+        return self._child_method()
 
-    def rfrailty(self):
+    def _rfrailty(self):
         """See the documentation in archimedean.py
         """
-        return self.child_method()
+        return self._child_method()
 
     def _c(self, var):
         """Return the value of the copula taken on (u,v)
@@ -336,7 +327,7 @@ class Archimedean(Multivariate):
         output = np.zeros((self.n_sample, self.dim))
         for i in range(0, self.n_sample):
             samplegamma = np.random.gamma(1, 1, self.dim)
-            samplefrailty = self.rfrailty()
+            samplefrailty = self._rfrailty()
             geninv = self._generator_inv(samplegamma/samplefrailty)
             output[i, :] = geninv
         return output
@@ -374,6 +365,26 @@ class Extreme(Multivariate):
     Args:
         Multivariate (object):
             see Multivariate object
+
+    Attributes:
+        asy (list[float], optional):
+            asymmetry coefficients. Defaults to None.
+
+        copula_type (CopulaTypes, optional):
+            identifier of the copula. Defaults to None.
+
+        psi1 (float, optional):
+            first coefficient of asymmetry. Defaults to None.
+
+        psi2 (float, optional):
+            second coefficient of asymmetry. Defaults to None.
+
+        sigmat (ndarray, optional):
+            ndarray with shape (dim,dim). Defaults to None.
+
+        theta (float, optional):
+            parameter of the copula. Defaults to None.
+
     """
 
     copula_type = None
@@ -384,44 +395,44 @@ class Extreme(Multivariate):
     asy = None
 
     @abc.abstractmethod
-    def child_method(self):
+    def _child_method(self):
         """abstract method
         """
 
     def _pickands(self, var):
         """See the documentation in evd.py
         """
-        return self.child_method()
+        return self._child_method()
 
     def _pickandsdot(self, var, j):
         """See the documentation in evd.py
         """
-        return self.child_method()
+        return self._child_method()
 
-    def mvalog_check(self, dep):
+    def _mvalog_check(self, dep):
         """See the documentation in evd.py
         """
-        return self.child_method()
+        return self._child_method()
 
-    def rmvlog_tawn(self):
+    def _rmvlog_tawn(self):
         """See the documentation in evd.py
         """
-        return self.child_method()
+        return self._child_method()
 
-    def rmvalog_tawn(self, number, alpha, asy):
+    def _rmvalog_tawn(self, number, alpha, asy):
         """See the documentation in evd.py
         """
-        return self.child_method()
+        return self._child_method()
 
-    def rextfunc(self, index, cholesky=None):
+    def _rextfunc(self, index, cholesky=None):
         """See the documentation in evd.py
         """
-        return self.child_method()
+        return self._child_method()
 
-    def sigma2covar(self, index):
+    def _sigma2covar(self, index):
         """See the documentation in evd.py
         """
-        return self.child_method()
+        return self._child_method()
 
     def _l(self, var):
         """Return the value of the stable tail dependence function on u.
@@ -561,25 +572,25 @@ class Extreme(Multivariate):
         for i in range(0, self.n_sample):
             zeta = np.random.exponential(1)
             if self.copula_type in matsim:
-                covar = self.sigma2covar(0)
+                covar = self._sigma2covar(0)
                 cholesky = np.linalg.cholesky(covar).T
-                extfunc = self.rextfunc(0, cholesky)
+                extfunc = self._rextfunc(0, cholesky)
             if self.copula_type in dirlog:
-                extfunc = self.rextfunc(0)
+                extfunc = self._rextfunc(0)
 
             output[i, :] = extfunc / zeta
 
             for j in range(1, self.dim):
                 zeta = np.random.exponential(1)
                 if self.copula_type in matsim:
-                    covar = self.sigma2covar(j)
+                    covar = self._sigma2covar(j)
                     cholesky = np.linalg.cholesky(covar).T
 
                 while (1.0 / zeta > output[i, j]):
                     if self.copula_type in matsim:
-                        extfunc = self.rextfunc(j, cholesky)
+                        extfunc = self._rextfunc(j, cholesky)
                     if self.copula_type in dirlog:
-                        extfunc = self.rextfunc(j)
+                        extfunc = self._rextfunc(j)
                     res = True
                     for k in range(0, j):
                         if (extfunc[k] / zeta >= output[i, k]):
@@ -609,24 +620,24 @@ class Extreme(Multivariate):
         if self.copula_type in condsim_numbers:
             output = self._cond_sim()
         if self.copula_type == CopulaTypes.GUMBEL:
-            output = frechet(self.rmvlog_tawn())
+            output = _frechet(self._rmvlog_tawn())
             output.reshape(self.n_sample, self.dim)
         if self.copula_type == CopulaTypes.ASYMMETRIC_LOGISTIC:
             number = int(2**self.dim - 1)
             dep = np.repeat(self.theta, number - self.dim)
             if (self.dim == 2) and (self.asy is None):
                 self.asy = [self.psi1, self.psi2, [1-self.psi1, 1-self.psi2]]
-            asy = self.mvalog_check(dep).reshape(-1)
+            asy = self._mvalog_check(dep).reshape(-1)
             dep = np.concatenate([np.repeat(1, self.dim), dep], axis=None)
-            output = frechet(self.rmvalog_tawn(number, dep, asy))
+            output = _frechet(self._rmvalog_tawn(number, dep, asy))
             output = output.reshape(self.n_sample, self.dim)
         if self.copula_type in extsim_numbers:
             output = np.exp(-1/self._ext_sim())
         return output
 
 
-def frechet(var):
-    """Probability distribution function for Frechet's law
+def _frechet(var):
+    """Probability distribution function for _frechet's law
 
     Args:
         var (real):

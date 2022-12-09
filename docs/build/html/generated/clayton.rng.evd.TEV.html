@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>clayton.rng.evd.TEV &#8212; clayton 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="clayton.rng.evd.Logistic" href="clayton.rng.evd.Logistic.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="clayton-rng-evd-tev">
+<h1>clayton.rng.evd.TEV<a class="headerlink" href="#clayton-rng-evd-tev" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="clayton.rng.evd.TEV">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">clayton.rng.evd.</span></span><span class="sig-name descname"><span class="pre">TEV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigmat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#clayton.rng.evd.TEV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for t extreme value model.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>Extreme (Extreme):</dt><dd><p>Extreme object.</p>
+</dd>
+</dl>
+</dd>
+<dt>Raises:</dt><dd><dl class="simple">
+<dt>ValueError:</dt><dd><p>psi1 is not positive.</p>
+</dd>
+<dt>ValueError:</dt><dd><p>sigmat is not a squared matrix.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>clayton.rng.evd.TEV:</dt><dd><p>a TEV object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="clayton.rng.evd.TEV.__init__">
+<em class="property"><span class="pre">abstract</span> </em><span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigmat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">psi1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#clayton.rng.evd.TEV.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate TEV copula model.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>sigmat (ndarray, optional):</dt><dd><p>ndarray of shape (dim,dim). Defaults to None.</p>
+</dd>
+<dt>psi1 (float, optional):</dt><dd><p>positive float. Defaults to None.</p>
+</dd>
+<dt>n_sample (int, optional):</dt><dd><p>sample size. Defaults to 1.</p>
+</dd>
+<dt>dim (int, optional):</dt><dd><p>dimension. Defaults to 2.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#clayton.rng.evd.TEV.__init__" title="clayton.rng.evd.TEV.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([sigmat, psi1, n_sample, dim])</p></td>
+<td><p>Instantiate TEV copula model.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample</span></code>(inv_cdf)</p></td>
+<td><p>Draws a bivariate sample the desired copula and invert it by a given generalized inverse of cumulative distribution function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_unimargin</span></code>()</p></td>
+<td><p>Sample from extreme value copula with uniform margins.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">asy</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copula_type</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">invalid_thetas</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi1</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">psi2</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sigmat</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">theta</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">theta_interval</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">clayton</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api.html#base">Base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api.html#archimedean">Archimedean</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../api.html#extreme">Extreme</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="clayton.rng.evd.html">clayton.rng.evd</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clayton.rng.evd.AsyMix.html">clayton.rng.evd.AsyMix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clayton.rng.evd.AsyNegLog.html">clayton.rng.evd.AsyNegLog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clayton.rng.evd.AsymmetricLogistic.html">clayton.rng.evd.AsymmetricLogistic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clayton.rng.evd.Bilog.html">clayton.rng.evd.Bilog</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clayton.rng.evd.HuslerReiss.html">clayton.rng.evd.HuslerReiss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="clayton.rng.evd.Logistic.html">clayton.rng.evd.Logistic</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">clayton.rng.evd.TEV</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">Documentation</a><ul>
+      <li>Previous: <a href="clayton.rng.evd.Logistic.html" title="previous chapter">clayton.rng.evd.Logistic</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Alexis Boulin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.2.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/generated/clayton.rng.evd.TEV.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
