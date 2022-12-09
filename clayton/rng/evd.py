@@ -21,7 +21,6 @@ Structure :
 
 import math
 import numpy as np
-import numpy.matlib
 
 from scipy.stats import norm
 from scipy.stats import t
@@ -495,12 +494,11 @@ class HuslerReiss(Extreme):
                 a matrix positive definite
         """
 
-        covar = 0.5 * (np.matlib.repmat(self.sigmat[:, index], 1,
-                                        self.sigmat.shape[0]).reshape(
+        covar = 0.5 * (np.repeat(self.sigmat[:, index], self.sigmat.shape[0]).reshape(
             self.sigmat.shape[0],
-            self.sigmat.shape[0], order='F') +
-            np.matlib.repmat(self.sigmat[index, :], self.sigmat.shape[1], 1).reshape(
-                self.sigmat.shape[0], self.sigmat.shape[0]) - self.sigmat)
+            self.sigmat.shape[0]) +
+            np.repeat(self.sigmat[index, :], self.sigmat.shape[1]).reshape(
+                self.sigmat.shape[0], self.sigmat.shape[0], order='F') - self.sigmat)
         covar = np.delete(covar, index, axis=0)
         covar = np.delete(covar, index, axis=1)
         return covar

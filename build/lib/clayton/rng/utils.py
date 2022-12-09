@@ -18,7 +18,7 @@ def maximum_n(n, x):
 
 
 def subsets(d):
-    """All subsets of \{1,\dots,d} (empty set is not taken into account).
+    """All subsets of {1,dots,d} (empty set is not taken into account).
 
     Output
     ------
@@ -45,7 +45,7 @@ def rpstable(cexp):
 
 
 def mvrnorm_chol_arma(n, mu, chol_cov):
-    """ Set all the elements to random values using 
+    """ Set all the elements to random values using
     a normal/Gaussian distribution with mu mean and chol_cov * chol_cov.T variance.
     Input
     -----
@@ -65,16 +65,16 @@ def mvrnorm_chol_arma(n, mu, chol_cov):
 
 
 def rdir(n, alpha, normalize=True):
-    """ Random variate generation for Dirichlet distribution on \eqn{S_{d}}{Sd}
+    """ Random variate generation for Dirichlet distribution on eqn{S_{d}}{Sd}
     A function to sample Dirichlet random variables, based on the representation
-    as ratios of Gamma. 
+    as ratios of Gamma.
 
     Input
     -----
         n         : sample size
         alpha     : vector of parameter
-        normalize : If \code{False}, the function returns Gamma variates with parameter
-                    \code{alpha}.
+        normalize : If False, the function returns Gamma variates with parameter
+                    alpha.
     """
     sample = np.zeros((n, len(alpha)))
     for j in range(0, len(alpha)):
