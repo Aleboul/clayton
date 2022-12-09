@@ -9,6 +9,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install sphinx sphinx_rtd_theme
+          pip install numpy
+          pip install scipy
           pip install clayton
       - name: Sphinx build
         run: |
