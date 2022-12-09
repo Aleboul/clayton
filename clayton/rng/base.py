@@ -166,7 +166,6 @@ class Multivariate:
 
 class Archimedean(Multivariate):
     """Base class for multivariate archimedean copulas.
-    This class allowd to use methods which use the generator function.
 
     Args:
         Multivariate (object):
@@ -360,30 +359,10 @@ class Archimedean(Multivariate):
 
 class Extreme(Multivariate):
     """Base class for multivariate extreme value copulas.
-    This class allows to use methods which use the Pickands dependence function.
 
     Args:
         Multivariate (object):
             see Multivariate object
-
-    Attributes:
-        asy (list[float], optional):
-            asymmetry coefficients. Defaults to None.
-
-        copula_type (CopulaTypes, optional):
-            identifier of the copula. Defaults to None.
-
-        psi1 (float, optional):
-            first coefficient of asymmetry. Defaults to None.
-
-        psi2 (float, optional):
-            second coefficient of asymmetry. Defaults to None.
-
-        sigmat (ndarray, optional):
-            ndarray with shape (dim,dim). Defaults to None.
-
-        theta (float, optional):
-            parameter of the copula. Defaults to None.
 
     """
 
