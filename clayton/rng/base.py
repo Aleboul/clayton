@@ -4,7 +4,7 @@ allows us to separate the effect of dependence from the effect of the marginal d
 .. math:: \mathbb{P}\{ X_1 \leq x_1, \dots, X_d \leq x_d \} =
                 C( \mathbb{P}\{X_1 \leq x_1\}, \dots, \mathbb{P} \{X_d \leq x_d\}),
 
-where :math:`(x_1,\dots,x_d) \in \mathbb{R}^d`. The main consequence of this identity is that 
+where :math:`(x_1,\dots,x_d) \in \mathbb{R}^d`. The main consequence of this identity is that
 the copula completely characterizes the stochastic dependence between the margins of :math:`\mathbf{X}`.
 
 Structure :
@@ -19,6 +19,7 @@ import abc
 from enum import Enum
 import numpy as np
 from scipy.optimize import brentq
+from scipy.integrate import quad
 
 
 EPSILON = 1e-12
@@ -634,6 +635,234 @@ class Extreme(Multivariate):
         if self.copula_type in extsim_numbers:
             output = np.exp(-1/self._ext_sim())
         return output
+
+    def true_wmado(self, weight):
+        """Return the value of the w_madogram taken on w.
+
+        Inputs
+        ------
+            weight (list of [float]) : element of the simplex.
+        """
+        value = self._pickands(weight) / (1+self._pickands(weight)) - \
+            (1/self.dim)*np.sum(weight / (1+weight))
+        return value
+
+    # Compute asymptotic variance of the multivariate madogram
+
+    def _integrand_ev1(self, var, weight, j):
+        """First integrand.
+
+        Inputs
+        ------
+            var(float)       : float between 0 and 1.
+            weight(list[float]) : d-array of the simplex.
+            j(int)         : int \geq 0.
+        """
+        vectz = var*weight / (1-weight[j])
+        vectz[j] = (1-var)  # start at 0 if j = 1
+        pickandsj = self._pickands(weight) / weight[j]
+        value_ = self._pickands(vectz) + (1-var) * \
+            (pickandsj + (1-weight[j])/weight[j] - 1) + var*weight[j] / (1-weight[j])+1
+        return math.pow(value_, -2)
+
+    def _integrand_ev2(self, var, weight, j, k):
+        """Second integrand.
+
+        Inputs
+        ------
+            var (float)       : float between 0 and 1.
+            weight (list[float]) : d-array of the simplex.
+            j (int)         : int \geq 0.
+            k (int)         : int \neq j.
+        """
+        vectz = 0 * weight
+        vectz[j] = (1-var)
+        vectz[k] = var
+        pickandsj = self._pickands(weight) / weight[j]
+        pickandsk = self._pickands(weight) / weight[k]
+        value_ = self._pickands(vectz) + (1-var) * (pickandsj +
+                                              (1-weight[j])/weight[j] - 1) + var * (pickandsk + (1-weight[k])/weight[k] - 1) + 1
+        return math.pow(value_, -2)
+
+    def _integrand_ev3(self, var, weight, j, k):
+        """Third integrand.
+
+        Inputs
+        ------
+            var(float)       : float between 0 and 1.
+            weight(list[float]) : d-array of the simplex.
+            j(int)         : int \geq 0.
+            k(int)         : int \neq j.
+        """
+        vectz = 0 * weight
+        vectz[j] = (1-var)
+        vectz[k] = var
+        value_ = self._pickands(vectz) + (1-var) * \
+            (1-weight[j])/weight[j] + var * (1-weight[k])/weight[k]+1
+        return math.pow(value_, -2)
+
+    def _integrand_ev4(self, var, weight, j):
+        """Fourth integrand.
+
+        Inputs
+        ------
+            var (float)       : float between 0 and 1.
+            weight (list[float]) : d-array of the simplex.
+            j (int)         : int \geq 0.
+        """
+        vectz = var*weight / (1-weight[j])
+        vectz[j] = (1-var)
+        value_ = self._pickands(vectz) + (1-var) * (1-weight[j])/weight[j] + var*weight[j]/(1-weight[j])+1
+        return math.pow(value_, -2)
+
+    def _integrand_ev5(self, var, weight, j, k):
+        """Fifth integrand.
+
+        Inputs
+        ------
+            var(float)       : float between 0 and 1.
+            weight(list[float]) : d-array of the simplex.
+            j(int)         : int \geq 1.
+            k(int)         : int \geq j.
+        """
+        vectz = 0 * weight
+        vectz[j] = (1-var)
+        vectz[k] = var
+        pickandsk = self._pickands(weight) / weight[k]
+        value_ = self._pickands(vectz) + (1-var) * \
+            (1-weight[j])/weight[j] + var * (pickandsk + (1-weight[k])/weight[k]-1)+1
+        return math.pow(value_, -2)
+
+    def _integrand_ev6(self, var, weight, j, k):
+        """Sixth integrand.
+
+        Inputs
+        ------
+            var(float)       : float between 0 and 1.
+            weight(list[float]) : d-array of the simplex.
+            j(int)         : int \geq k.
+            k(int)         : int \geq 0.
+        """
+        vectz = 0 * weight
+        vectz[k] = (1-var)
+        vectz[j] = var
+        pickandsk = self._pickands(weight) / weight[k]
+        value_ = self._pickands(vectz) + (1-var) * \
+            (pickandsk + (1-weight[k])/weight[k]-1) + var * (1-weight[j])/weight[j]+1
+        return math.pow(value_, -2)
+
+    def var_mado(self, weight, matp, jointp, corr=True):
+        """Return the variance of the Madogram for a given point on the simplex
+
+        Inputs
+        ------
+            weight (list[float])  : array in the simplex .. math:: (w_0, \dots, w_{d-1}).
+            matp (array[float]) : d \times d array of probabilities, margins are in the diagonal
+                               while probabilities of two entries may be missing are in the antidiagonal.
+            jointp ([float])      : joint probability of missing.
+        """
+
+        if corr:
+            lambda_ = weight
+        else:
+            lambda_ = np.zeros(self.dim)
+
+        # Calcul de .. math:: \sigma_{d+1}^2
+        squared_gamma_1 = math.pow(
+            jointp, -1)*(math.pow(1+self._pickands(weight), -2) * self._pickands(weight) / (2+self._pickands(weight)))
+        squared_gamma_ = []
+        for j in range(0, self.dim):
+            v_aux = math.pow(matp[j][j], -1)*(math.pow(self._mu(weight, j) /
+                                                    (1+self._pickands(weight)), 2) * weight[j] / (2*self._pickands(weight) + 1 + 1 - weight[j]))
+            squared_gamma_.append(v_aux)
+        gamma_1_ = []
+        for j in range(0, self.dim):
+            v_1 = self._mu(weight, j) / (2 * math.pow(1+self._pickands(weight), 2)
+                                    ) * (weight[j] / (2*self._pickands(weight) + 1 + 1 - weight[j]))
+            v_2 = self._mu(weight, j) / (2 * math.pow(1+self._pickands(weight), 2))
+            v_3 = self._mu(
+                weight, j) / (weight[j]*(1-weight[j])) * quad(lambda s: self._integrand_ev1(s, weight, j), 0.0, 1-weight[j])[0]
+            v_aux = math.pow(matp[j][j], -1)*(v_1 - v_2 + v_3)
+            gamma_1_.append(v_aux)
+        tau_ = []
+        for k in range(0, self.dim):
+            for j in range(0, k):
+                v_1 = self._mu(weight, j) * self._mu(weight, k) * \
+                    math.pow(1+self._pickands(weight), -2)
+                v_2 = self._mu(weight, j) * self._mu(weight, k) / (weight[j] * weight[k]) * quad(
+                    lambda s: self._integrand_ev2(s, weight, j, k), 0.0, 1.0)[0]
+                v_aux = (matp[j][k] / (matp[j][j] * matp[k][k]))*(v_2 - v_1)
+                tau_.append(v_aux)
+
+        squared_sigma_d_1 = squared_gamma_1 + \
+            np.sum(squared_gamma_) - 2 * np.sum(gamma_1_) + 2 * np.sum(tau_)
+        if jointp < 1:
+            # Calcul de .. math:: \sigma_{j}^2
+            squared_sigma_ = []
+            for j in range(0, self.dim):
+                v_aux = (math.pow(jointp, -1) -
+                      math.pow(matp[j][j], -1))*math.pow(1+weight[j], -2) * weight[j]/(2+weight[j])
+                v_aux = math.pow(1+lambda_[j]*(self.dim-1), 2) * v_aux
+                squared_sigma_.append(v_aux)
+
+            # Calcul de .. math:: \sigma_{jk} with j < k
+            sigma_ = []
+            for k in range(0, self.dim):
+                for j in range(0, k):
+                    v_1 = 1 / \
+                        (weight[j] * weight[k]) * quad(lambda s: self._integrand_ev3(s,
+                                                                           weight, j, k), 0.0, 1.0)[0]
+                    v_2 = 1/(1+weight[j]) * 1/(1+weight[k])
+                    v_aux = (math.pow(jointp, -1) - math.pow(matp[j][j], -1) - math.pow(
+                        matp[k][k], -1) + matp[j][k]/(matp[j][j]*matp[k][k]))*(v_1 - v_2)
+                    v_aux = (1+lambda_[j]*(self.dim-1)) * \
+                        (1+lambda_[k]*(self.dim-1)) * v_aux
+                    sigma_.append(v_aux)
+
+            # Calcul de .. math:: \sigma_{j}^{(1)}, j \in \{1,dots,d\}
+            sigma_1_ = []
+            for j in range(0, self.dim):
+                v_1 = 1/(weight[j] * (1-weight[j])) * \
+                    quad(lambda s: self._integrand_ev4(
+                        s, weight, j), 0.0, 1 - weight[j])[0]
+                v_2 = 1/(1+self._pickands(weight)) * \
+                    (1/(2+self._pickands(weight)) - 1 / (1+weight[j]))
+                v_aux = (math.pow(jointp, -1) - math.pow(matp[j][j], -1))*(v_1 + v_2)
+                v_aux = (1+lambda_[j]*(self.dim-1))*v_aux
+                sigma_1_.append(v_aux)
+
+            sigma_2_ = []
+            for k in range(0, self.dim):
+                for j in range(0, self.dim):
+                    if j == k:
+                        v_aux = 0
+                        sigma_2_.append(v_aux)
+                    elif j < k:
+                        v_1 = self._mu(
+                            weight, k) / (weight[j] * weight[k]) * quad(lambda s: self._integrand_ev5(s, weight, j, k), 0.0, 1.0)[0]
+                        v_2 = self._mu(weight, k) / \
+                            (1+self._pickands(weight)) * 1 / (1+weight[j])
+                        v_aux = (math.pow(matp[k][k], -1) - matp[j]
+                              [k]/(matp[j][j]*matp[k][k]))*(v_1 - v_2)
+                        v_aux = (1 + lambda_[j]*(self.dim-1))*v_aux
+                        sigma_2_.append(v_aux)
+                    else:
+                        v_1 = self._mu(
+                            weight, k) / (weight[j] * weight[k]) * quad(lambda s: self._integrand_ev6(s, weight, j, k), 0.0, 1.0)[0]
+                        v_2 = self._mu(weight, k) / \
+                            (1+self._pickands(weight)) * 1 / (1+weight[j])
+                        v_aux = (math.pow(matp[k][k], -1) - matp[k]
+                              [j]/(matp[j][j]*matp[k][k]))*(v_1 - v_2)
+                        v_aux = (1 + lambda_[j]*(self.dim-1))*v_aux
+                        sigma_2_.append(v_aux)
+
+            if corr:
+                return (1/self.dim**2) * np.sum(squared_sigma_) + squared_sigma_d_1 + (2/self.dim**2) * np.sum(sigma_) - (2/self.dim) * np.sum(sigma_1_) + (2/self.dim) * np.sum(sigma_2_)
+            else:
+                return (1/self.dim**2) * np.sum(squared_sigma_) + squared_sigma_d_1 + (2/self.dim**2) * np.sum(sigma_) - (2/self.dim) * np.sum(sigma_1_) + (2/self.dim) * np.sum(sigma_2_)
+
+        else:
+            return squared_sigma_d_1
 
 
 def _frechet(var):

@@ -1,6 +1,6 @@
 from .base import CopulaTypes, Multivariate, Extreme
 from .evd import (Logistic, AsymmetricLogistic, HuslerReiss,
-                  AsyNegLog, TEV, Bilog)
+                  AsyNegLog, TEV, Dirichlet, Bilog)
 from .archimedean import (Clayton, Frank, Amh,
                           Joe, Nelsen9, Nelsen10,
                           Nelsen11, Nelsen12, Nelsen13,
@@ -16,6 +16,7 @@ __all__ = (
     'HuslerReiss',
     'AsyNegLog',
     'TEV',
+    'Dirichlet',
     'Bilog',
     'Clayton',
     'Frank',

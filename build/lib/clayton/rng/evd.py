@@ -559,7 +559,7 @@ class AsyNegLog(Extreme):
     copula_type = CopulaTypes.ASYMMETRIC_NEGATIVE_LOGISTIC
     theta_interval = [1, float('inf')]
     invalid_thetas = []
-    
+
     @abc.abstractmethod
     def __init__(
         self,
@@ -673,7 +673,7 @@ class AsyMix(Extreme):
     copula_type = CopulaTypes.ASYMMETRIC_MIXED_MODEL
     theta_interval = [0, float('inf')]
     invalid_thetas = []
-    
+
     @abc.abstractmethod
     def __init__(
         self,
@@ -779,7 +779,7 @@ class TEV(Extreme):
     copula_type = CopulaTypes.TEV
     theta_interval = [-1, 1]
     invalid_thetas = []
-    
+
     @abc.abstractmethod
     def __init__(
         self,
@@ -931,11 +931,100 @@ class TEV(Extreme):
         return samp
 
 
+class Dirichlet(Extreme):
+    """Class for Dirichlet mixture models.
+
+    Args:
+        Extreme (object):
+            Extreme object.
+
+    Returns:
+        clayton.rng.evd.Dirichlet:
+    """
+
+    copula_type = CopulaTypes.DIRICHLET
+
+    @abc.abstractmethod
+    def __init__(
+        self,
+        sigmat=None,
+        theta=None,
+        n_sample=1,
+        dim=2
+    ):
+        """Instantiate Dirichlet mixture model.
+
+        Args:
+            sigmat (ndarray, optional):
+                ndarray of shape (m,dim) where m is the number in the mixture.
+                Defaults to None.
+            theta (float, optional):
+                list of positive float, sum to 1. Defaults to None.
+            n_sample (int, optional):
+                sample size. Defaults to 1.
+            dim (int, optional):
+                dimension. Defaults to 2.
+        """
+        super().__init__(
+            n_sample=n_sample,
+            dim=dim
+        )
+
+        self.sigmat = sigmat
+        self.theta = theta
+
+        if self.sigmat is not None and self.theta is not None:
+            self._check_param()
+
+    def _check_param(self):
+        """Check parameter theta
+
+        Raises:
+            ValueError:
+                invalid argument for theta
+        """
+        if np.sum(self.theta) != 1.0:
+            raise ValueError('sum of theta should be equal to one')
+        if np.any((self.theta < 0.0) | (self.theta > 1.0)):
+            raise ValueError('each component of theta should be between 0 and 1')
+        if ((self.sigmat.shape[0] != len(self.theta)) or
+                (self.sigmat.shape[1] != self.dim) or
+                np.any(self.sigmat < 0.0)):
+            raise ValueError('invalid argument for sigmat')
+
+    def _rextfunc(self, index):
+        """ Generate from extremal Dirichlet \eqn{Y \sim {P_x}}, where
+        \eqn{P_{x}} is the probability of extremal functions from a Dirichlet mixture
+
+        Args:
+            index (int):
+                index of the location.
+
+        Returns:
+            ndarray of dim (d)
+        """
+        int_seq = np.arange(self.dim)
+        # Probability weights
+        weights = np.zeros(len(self.theta))
+        for k in range(0, len(self.theta)):
+            weights[k] = len(self.theta) * self.theta[k] * \
+                self.sigmat[index, k] / sum(self.sigmat[:, k])
+
+        m = np.random.choice(int_seq, 1, False, weights)[0]
+
+        sample = np.zeros(self.dim)
+        gzero = np.random.gamma(self.sigmat[index, m] + 1.0, 1.0, size=1)
+        for j in range(0, self.dim):
+            sample[j] = np.random.gamma(self.sigmat[j, m], 1.0, size=1) / gzero
+        sample[index] = 1.0
+        return sample
+
+
 class Bilog(Extreme):
     """ Class for bilogistic distribution model Smith (1990). """
 
     copula_type = CopulaTypes.BILOG
-    
+
     @abc.abstractmethod
     def __init__(
             self,

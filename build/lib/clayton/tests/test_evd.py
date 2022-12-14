@@ -10,6 +10,7 @@ from clayton.rng.evd import HuslerReiss
 from clayton.rng.evd import AsyNegLog
 from clayton.rng.evd import AsyMix
 from clayton.rng.evd import TEV
+from clayton.rng.evd import Dirichlet
 from clayton.rng.evd import Bilog
 
 
@@ -47,7 +48,8 @@ class TestUser(unittest.TestCase):
         self.assertTrue(isinstance(
             al1, clayton.rng.base.Extreme))
         with self.assertRaises(Exception):
-            AsymmetricLogistic(theta=-1, asy=[0.05, 0.3, [0.95, 0.7]])  # negative theta
+            # negative theta
+            AsymmetricLogistic(theta=-1, asy=[0.05, 0.3, [0.95, 0.7]])
         with self.assertRaises(Exception):
             AsymmetricLogistic(
                 theta=1/4, asy=[0.5, 0.3, [0.95, 0.7]], dim=2)  # does not sum to 1
@@ -136,6 +138,27 @@ class TestUser(unittest.TestCase):
             [[1, 0.8, 0.8], [0.8, 1.0, 0.8], [0.8, 0.8, 1.0]]), 0.2
         tv1 = TEV(sigmat=sigmat, psi1=psi1, n_sample=n_sample, dim=dim)
         tv1.sample_unimargin()
+
+    def test_multivariate_instantiation_dir(self):
+        """Check if initiated object basic contraints
+        of dirichlet mixture models
+        """
+        sigmat = np.array([[2, 1, 1], [1, 2, 1], [1, 1, 2]])
+        theta = np.array([1/3, 1/3, 1/3])
+        dr1 = Dirichlet(sigmat=sigmat, theta=theta, dim=3)
+        self.assertTrue(isinstance(
+            dr1, clayton.rng.base.Extreme))
+        with self.assertRaises(Exception):
+            theta = np.array([1/3, 2/3, 1/3])  # wrong theta
+            Dirichlet(sigmat=sigmat, theta=theta, dim=3)
+        with self.assertRaises(Exception):
+            # wrong matrix
+            sigmat = np.array([[1, 0.7], [0.8, 1.0]])
+            Dirichlet(sigmat=sigmat, theta=theta, dim=3)
+        n_sample, dim, sigmat, theta = 1000, 3, np.array(
+            [[2, 1, 1], [1, 2, 1], [1, 1, 2]]), np.array([1/3, 1/3, 1/3])
+        dr1 = Dirichlet(sigmat=sigmat, theta=theta, n_sample=n_sample, dim=dim)
+        dr1.sample_unimargin()
 
     def test_multivariate_instantiation_bilog(self):
         """Check if initiated object basic contraints
