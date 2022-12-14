@@ -993,8 +993,8 @@ class Dirichlet(Extreme):
             raise ValueError('invalid argument for sigmat')
 
     def _rextfunc(self, index):
-        """ Generate from extremal Dirichlet \eqn{Y \sim {P_x}}, where
-        \eqn{P_{x}} is the probability of extremal functions from a Dirichlet mixture
+        """ Generate from extremal Dirichlet Y follows P_x, where
+        P_{x} is the probability of extremal functions from a Dirichlet mixture
 
         Args:
             index (int):
