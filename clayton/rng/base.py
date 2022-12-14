@@ -662,7 +662,8 @@ class Extreme(Multivariate):
         vectz[j] = (1-var)  # start at 0 if j = 1
         pickandsj = self._pickands(weight) / weight[j]
         value_ = self._pickands(vectz) + (1-var) * \
-            (pickandsj + (1-weight[j])/weight[j] - 1) + var*weight[j] / (1-weight[j])+1
+            (pickandsj + (1-weight[j])/weight[j] - 1) + \
+            var*weight[j] / (1-weight[j])+1
         return math.pow(value_, -2)
 
     def _integrand_ev2(self, var, weight, j, k):
@@ -681,7 +682,7 @@ class Extreme(Multivariate):
         pickandsj = self._pickands(weight) / weight[j]
         pickandsk = self._pickands(weight) / weight[k]
         value_ = self._pickands(vectz) + (1-var) * (pickandsj +
-                                              (1-weight[j])/weight[j] - 1) + var * (pickandsk + (1-weight[k])/weight[k] - 1) + 1
+                                                    (1-weight[j])/weight[j] - 1) + var * (pickandsk + (1-weight[k])/weight[k] - 1) + 1
         return math.pow(value_, -2)
 
     def _integrand_ev3(self, var, weight, j, k):
@@ -712,7 +713,8 @@ class Extreme(Multivariate):
         """
         vectz = var*weight / (1-weight[j])
         vectz[j] = (1-var)
-        value_ = self._pickands(vectz) + (1-var) * (1-weight[j])/weight[j] + var*weight[j]/(1-weight[j])+1
+        value_ = self._pickands(
+            vectz) + (1-var) * (1-weight[j])/weight[j] + var*weight[j]/(1-weight[j])+1
         return math.pow(value_, -2)
 
     def _integrand_ev5(self, var, weight, j, k):
@@ -730,7 +732,8 @@ class Extreme(Multivariate):
         vectz[k] = var
         pickandsk = self._pickands(weight) / weight[k]
         value_ = self._pickands(vectz) + (1-var) * \
-            (1-weight[j])/weight[j] + var * (pickandsk + (1-weight[k])/weight[k]-1)+1
+            (1-weight[j])/weight[j] + var * \
+            (pickandsk + (1-weight[k])/weight[k]-1)+1
         return math.pow(value_, -2)
 
     def _integrand_ev6(self, var, weight, j, k):
@@ -748,7 +751,8 @@ class Extreme(Multivariate):
         vectz[j] = var
         pickandsk = self._pickands(weight) / weight[k]
         value_ = self._pickands(vectz) + (1-var) * \
-            (pickandsk + (1-weight[k])/weight[k]-1) + var * (1-weight[j])/weight[j]+1
+            (pickandsk + (1-weight[k])/weight[k]-1) + \
+            var * (1-weight[j])/weight[j]+1
         return math.pow(value_, -2)
 
     def var_mado(self, weight, matp, jointp, corr=True):
@@ -760,6 +764,21 @@ class Extreme(Multivariate):
             matp (array[float]) : d \times d array of probabilities, margins are in the diagonal
                                while probabilities of two entries may be missing are in the antidiagonal.
             jointp ([float])      : joint probability of missing.
+
+        Args:
+            weight (float):
+                element of the simplex.
+            matp (ndarray of shape (dim,dim)):
+                matrice of bivariate probabilities of missing.
+            jointp (float):
+                joint probability of missing.
+            corr (bool, optional):
+                True if corrected madogram, False else. Defaults to True.
+
+        Returns:
+            float:
+                asymptotic variance of the corrected (if True) of the 
+                hybrid madogram.
         """
 
         if corr:
@@ -773,13 +792,14 @@ class Extreme(Multivariate):
         squared_gamma_ = []
         for j in range(0, self.dim):
             v_aux = math.pow(matp[j][j], -1)*(math.pow(self._mu(weight, j) /
-                                                    (1+self._pickands(weight)), 2) * weight[j] / (2*self._pickands(weight) + 1 + 1 - weight[j]))
+                                                       (1+self._pickands(weight)), 2) * weight[j] / (2*self._pickands(weight) + 1 + 1 - weight[j]))
             squared_gamma_.append(v_aux)
         gamma_1_ = []
         for j in range(0, self.dim):
             v_1 = self._mu(weight, j) / (2 * math.pow(1+self._pickands(weight), 2)
-                                    ) * (weight[j] / (2*self._pickands(weight) + 1 + 1 - weight[j]))
-            v_2 = self._mu(weight, j) / (2 * math.pow(1+self._pickands(weight), 2))
+                                         ) * (weight[j] / (2*self._pickands(weight) + 1 + 1 - weight[j]))
+            v_2 = self._mu(weight, j) / \
+                (2 * math.pow(1+self._pickands(weight), 2))
             v_3 = self._mu(
                 weight, j) / (weight[j]*(1-weight[j])) * quad(lambda s: self._integrand_ev1(s, weight, j), 0.0, 1-weight[j])[0]
             v_aux = math.pow(matp[j][j], -1)*(v_1 - v_2 + v_3)
@@ -801,7 +821,7 @@ class Extreme(Multivariate):
             squared_sigma_ = []
             for j in range(0, self.dim):
                 v_aux = (math.pow(jointp, -1) -
-                      math.pow(matp[j][j], -1))*math.pow(1+weight[j], -2) * weight[j]/(2+weight[j])
+                         math.pow(matp[j][j], -1))*math.pow(1+weight[j], -2) * weight[j]/(2+weight[j])
                 v_aux = math.pow(1+lambda_[j]*(self.dim-1), 2) * v_aux
                 squared_sigma_.append(v_aux)
 
@@ -811,7 +831,7 @@ class Extreme(Multivariate):
                 for j in range(0, k):
                     v_1 = 1 / \
                         (weight[j] * weight[k]) * quad(lambda s: self._integrand_ev3(s,
-                                                                           weight, j, k), 0.0, 1.0)[0]
+                                                                                     weight, j, k), 0.0, 1.0)[0]
                     v_2 = 1/(1+weight[j]) * 1/(1+weight[k])
                     v_aux = (math.pow(jointp, -1) - math.pow(matp[j][j], -1) - math.pow(
                         matp[k][k], -1) + matp[j][k]/(matp[j][j]*matp[k][k]))*(v_1 - v_2)
@@ -827,7 +847,8 @@ class Extreme(Multivariate):
                         s, weight, j), 0.0, 1 - weight[j])[0]
                 v_2 = 1/(1+self._pickands(weight)) * \
                     (1/(2+self._pickands(weight)) - 1 / (1+weight[j]))
-                v_aux = (math.pow(jointp, -1) - math.pow(matp[j][j], -1))*(v_1 + v_2)
+                v_aux = (math.pow(jointp, -1) -
+                         math.pow(matp[j][j], -1))*(v_1 + v_2)
                 v_aux = (1+lambda_[j]*(self.dim-1))*v_aux
                 sigma_1_.append(v_aux)
 
@@ -843,7 +864,7 @@ class Extreme(Multivariate):
                         v_2 = self._mu(weight, k) / \
                             (1+self._pickands(weight)) * 1 / (1+weight[j])
                         v_aux = (math.pow(matp[k][k], -1) - matp[j]
-                              [k]/(matp[j][j]*matp[k][k]))*(v_1 - v_2)
+                                 [k]/(matp[j][j]*matp[k][k]))*(v_1 - v_2)
                         v_aux = (1 + lambda_[j]*(self.dim-1))*v_aux
                         sigma_2_.append(v_aux)
                     else:
@@ -852,7 +873,7 @@ class Extreme(Multivariate):
                         v_2 = self._mu(weight, k) / \
                             (1+self._pickands(weight)) * 1 / (1+weight[j])
                         v_aux = (math.pow(matp[k][k], -1) - matp[k]
-                              [j]/(matp[j][j]*matp[k][k]))*(v_1 - v_2)
+                                 [j]/(matp[j][j]*matp[k][k]))*(v_1 - v_2)
                         v_aux = (1 + lambda_[j]*(self.dim-1))*v_aux
                         sigma_2_.append(v_aux)
 
