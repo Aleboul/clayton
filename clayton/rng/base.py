@@ -758,13 +758,6 @@ class Extreme(Multivariate):
     def var_mado(self, weight, matp, jointp, corr=True):
         """Return the variance of the Madogram for a given point on the simplex
 
-        Inputs
-        ------
-            weight (list[float])  : array in the simplex .. math:: (w_0, \dots, w_{d-1}).
-            matp (array[float]) : d \times d array of probabilities, margins are in the diagonal
-                               while probabilities of two entries may be missing are in the antidiagonal.
-            jointp ([float])      : joint probability of missing.
-
         Args:
             weight (float):
                 element of the simplex.
