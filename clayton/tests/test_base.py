@@ -52,11 +52,11 @@ class TestUser(unittest.TestCase):
         sample size
         """
         with self.assertRaises(Exception):
-            Multivariate(n_sample=complex(1, 2))
+            Multivariate(n_samples=complex(1, 2))
         with self.assertRaises(Exception):
-            Extreme(n_sample=0.5)
+            Extreme(n_samples=0.5)
         with self.assertRaises(Exception):
-            Archimedean(n_sample=-1)
+            Archimedean(n_samples=-1)
 
 
 if __name__ == '__main__':

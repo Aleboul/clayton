@@ -30,7 +30,7 @@ class Gaussian(Multivariate):
         self.is_pos_def()
         mean = np.zeros(self.d)
         sample = np.random.multivariate_normal(
-            mean=mean, cov=self.sigmat, size=self.n_sample)
+            mean=mean, cov=self.sigmat, size=self.n_samples)
         return norm.cdf(sample)
 
 
@@ -57,12 +57,12 @@ class Student(Multivariate):
     def multivariatet(self):
         '''
         Output:
-        Produce n_sample samples of d-dimensional multivariate t distribution
+        Produce n_samples samples of d-dimensional multivariate t distribution
         '''
         gamma = np.tile(np.random.gamma(self.theta/2., 2. /
-                        self.theta, self.n_sample), (self.d, 1)).T
+                        self.theta, self.n_samples), (self.d, 1)).T
         normobs = np.random.multivariate_normal(
-            np.zeros(self.d), self.Sigma, self.n_sample)
+            np.zeros(self.d), self.Sigma, self.n_samples)
         return normobs/np.sqrt(gamma)
 
     def sample_unimargin(self):

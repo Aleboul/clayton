@@ -76,13 +76,13 @@ class Multivariate:
     @abc.abstractmethod
     def __init__(
             self,
-            n_sample=1,
+            n_samples=1,
             dim=2,
     ):
         """Initialize Multivariate object.
 
         Args:
-            n_sample (int, optional):
+            n_samples (int, optional):
                 sample size. Defaults to 1.
             dim (int, optional):
                 dimension. Defaults to 2.
@@ -94,13 +94,13 @@ class Multivariate:
                 dimension is not a positive integer.
         """
 
-        if (n_sample is None or
-                (isinstance(n_sample, int) and n_sample > 0)):
-            self.n_sample = n_sample
+        if (n_samples is None or
+                (isinstance(n_samples, int) and n_samples > 0)):
+            self.n_samples = n_samples
         else:
             message = "The inserted sample's size value {} \
                      should be a positive integer"
-            raise ValueError(message.format(n_sample))
+            raise ValueError(message.format(n_samples))
 
         if (dim is None or
                 (isinstance(dim, int) and dim > 0)):
@@ -108,7 +108,7 @@ class Multivariate:
         else:
             message = "The inserted dimension value {} \
                  should be a positive integer"
-            raise ValueError(message.format(n_sample))
+            raise ValueError(message.format(n_samples))
 
     def _child_method(self):
         """abstract method.
@@ -124,10 +124,10 @@ class Multivariate:
         independently from a uniform over the segment [0,1].
 
         Returns:
-            ndarray of shape (n_sample, dim).
+            ndarray of shape (n_samples, dim).
         """
-        v_1 = np.random.uniform(low=0.0, high=1.0, size=self.n_sample)
-        v_2 = np.random.uniform(low=0.0, high=1.0, size=self.n_sample)
+        v_1 = np.random.uniform(low=0.0, high=1.0, size=self.n_samples)
+        v_2 = np.random.uniform(low=0.0, high=1.0, size=self.n_samples)
         output = np.vstack([v_1, v_2]).T
         return output
 
@@ -146,7 +146,7 @@ class Multivariate:
                 wrong size of inv_cdf.
 
         Returns:
-            ndarray of shape (n_sample, dim)
+            ndarray of shape (n_samples, dim)
         """
         if isinstance(inv_cdf, list) is False:
             message = "inv_cdf should be a list"
@@ -161,7 +161,7 @@ class Multivariate:
         sample_ = self.sample_unimargin()
         output = np.array([inv_cdf[j](sample_[:, j])
                            for j in range(0, self.dim)])
-        output = np.ravel(output).reshape(self.n_sample, self.dim, order='F')
+        output = np.ravel(output).reshape(self.n_samples, self.dim, order='F')
         return output
 
 
@@ -182,7 +182,7 @@ class Archimedean(Multivariate):
     def __init__(
             self,
             theta=None,
-            n_sample=1,
+            n_samples=1,
             dim=2
     ):
         """Instantiate the Archimedean object
@@ -190,7 +190,7 @@ class Archimedean(Multivariate):
         Args:
             theta (float):
                 parameter of the archimedean copula.
-            n_sample (int):
+            n_samples (int):
                 sample size.
             dim (int):
                 dimension.
@@ -202,7 +202,7 @@ class Archimedean(Multivariate):
         """
         super().__init__(
             dim=dim,
-            n_sample=n_sample
+            n_samples=n_samples
         )
         self.theta = theta
         if self.theta is not None:
@@ -278,12 +278,12 @@ class Archimedean(Multivariate):
                 if dim > 2.
 
         Returns:
-            ndarray of shape (n_sample, 2):
+            ndarray of shape (n_samples, 2):
                 random numbers generated through conditional simulation.
         """
 
         if self.dim == 2:
-            output = np.zeros((self.n_sample, self.dim))
+            output = np.zeros((self.n_samples, self.dim))
         else:
             message = "This generator can't generate an Archimedean copula for dim greater than 2"
             raise ValueError(message)
@@ -293,7 +293,7 @@ class Archimedean(Multivariate):
             value_ = (var - self._generator(var) /
                       self._generator_dot(var)) - vectv[1]
             return value_
-        for i in range(0, self.n_sample):
+        for i in range(0, self.n_samples):
             vectv = randomness[i]
 
             if func(EPSILON) > 0.0:
@@ -314,7 +314,7 @@ class Archimedean(Multivariate):
                 if self.theta is negative
 
         Returns:
-            ndarray of shape (n_sample, dim):
+            ndarray of shape (n_samples, dim):
                 random numbers generated through frailty simulation.
         """
 
@@ -325,8 +325,8 @@ class Archimedean(Multivariate):
                         association are only allowed."
                 raise ValueError(message.format(
                     self.theta, self.copula_type.name))
-        output = np.zeros((self.n_sample, self.dim))
-        for i in range(0, self.n_sample):
+        output = np.zeros((self.n_samples, self.dim))
+        for i in range(0, self.n_samples):
             samplegamma = np.random.gamma(1, 1, self.dim)
             samplefrailty = self._rfrailty()
             geninv = self._generator_inv(samplegamma/samplefrailty)
@@ -339,7 +339,7 @@ class Archimedean(Multivariate):
         chosen Archimedean copula is known or not.
 
         Returns:
-            ndarray of shape (n_sample, dim):
+            ndarray of shape (n_samples, dim):
                 random numbers generated with uniform margins.
         """
 
@@ -531,21 +531,21 @@ class Extreme(Multivariate):
                 if dim > 2.
 
         Returns:
-            ndarray with shape (n_sample,2):
+            ndarray with shape (n_samples,2):
                 random numbers generated from conditional simulation.
         """
 
         if self.dim > 2:
             message = "The dimension {} inserted is not compatible with {}."
             raise ValueError(message.format(self.dim, self.copula_type.name))
-        output = np.zeros((self.n_sample, self.dim))
+        output = np.zeros((self.n_samples, self.dim))
         randomness = self._generate_randomness()
 
         def func(var):
             vectu = np.array([vectv[0], var])
             value_ = self._dot_c(vectu, 0) - vectv[1]
             return value_
-        for i in range(0, self.n_sample):
+        for i in range(0, self.n_samples):
             vectv = randomness[i]
             sol = brentq(func, EPSILON, 1-EPSILON)
             vectu = [vectv[0], sol]
@@ -558,7 +558,7 @@ class Extreme(Multivariate):
         for more details.
 
         Returns:
-            ndarray with shape (n_sample,dim):
+            ndarray with shape (n_samples,dim):
                 random numbers generated from extremal functions.
         """
 
@@ -567,10 +567,10 @@ class Extreme(Multivariate):
             stdevmat = np.linalg.inv(np.diag(stdev))
             self.sigmat = stdevmat @ self.sigmat @ stdevmat
 
-        output = np.zeros((self.n_sample, self.dim))
+        output = np.zeros((self.n_samples, self.dim))
         matsim = [CopulaTypes.HUSLER_REISS, CopulaTypes.TEV]
         dirlog = [CopulaTypes.DIRICHLET, CopulaTypes.BILOG]
-        for i in range(0, self.n_sample):
+        for i in range(0, self.n_samples):
             zeta = np.random.exponential(1)
             if self.copula_type in matsim:
                 covar = self._sigma2covar(0)
@@ -609,7 +609,7 @@ class Extreme(Multivariate):
         is known.
 
         Returns:
-            ndarray with shape (n_sample, dim):
+            ndarray with shape (n_samples, dim):
                 sample with uniform margins.
         """
 
@@ -622,7 +622,7 @@ class Extreme(Multivariate):
             output = self._cond_sim()
         if self.copula_type == CopulaTypes.GUMBEL:
             output = _frechet(self._rmvlog_tawn())
-            output.reshape(self.n_sample, self.dim)
+            output.reshape(self.n_samples, self.dim)
         if self.copula_type == CopulaTypes.ASYMMETRIC_LOGISTIC:
             number = int(2**self.dim - 1)
             dep = np.repeat(self.theta, number - self.dim)
@@ -631,7 +631,7 @@ class Extreme(Multivariate):
             asy = self._mvalog_check(dep).reshape(-1)
             dep = np.concatenate([np.repeat(1, self.dim), dep], axis=None)
             output = _frechet(self._rmvalog_tawn(number, dep, asy))
-            output = output.reshape(self.n_sample, self.dim)
+            output = output.reshape(self.n_samples, self.dim)
         if self.copula_type in extsim_numbers:
             output = np.exp(-1/self._ext_sim())
         return output

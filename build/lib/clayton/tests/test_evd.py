@@ -35,8 +35,8 @@ class TestUser(unittest.TestCase):
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 100, 0.5
-        log1 = Logistic(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 100, 0.5
+        log1 = Logistic(theta=theta, dim=dim, n_samples=n_samples)
         log1.sample_unimargin()
 
     def test_multivariate_instantiation_asylog(self):
@@ -54,9 +54,9 @@ class TestUser(unittest.TestCase):
             AsymmetricLogistic(
                 theta=1/4, asy=[0.5, 0.3, [0.95, 0.7]], dim=2)  # does not sum to 1
 
-        n_sample, dim, theta, asy = 1000, 2, 1/4, [0.05, 0.3, [0.95, 0.7]]
+        n_samples, dim, theta, asy = 1000, 2, 1/4, [0.05, 0.3, [0.95, 0.7]]
         al1 = AsymmetricLogistic(
-            theta=theta, asy=asy, dim=dim, n_sample=n_sample)
+            theta=theta, asy=asy, dim=dim, n_samples=n_samples)
         al1.sample_unimargin()
 
     def test_multivariate_instantiation_huslerreiss(self):
@@ -71,9 +71,9 @@ class TestUser(unittest.TestCase):
             HuslerReiss(sigmat=np.array(
                 [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]), dim=3)  # not a cnsd
 
-        n_sample, dim, sigmat = 1000, 3, np.array(
+        n_samples, dim, sigmat = 1000, 3, np.array(
             [[0.0, 1.0, 1.0], [1.0, 0.0, 1.0], [1.0, 1.0, 0.0]])
-        hr1 = HuslerReiss(sigmat=sigmat, dim=dim, n_sample=n_sample)
+        hr1 = HuslerReiss(sigmat=sigmat, dim=dim, n_samples=n_samples)
         hr1.sample_unimargin()
 
     def test_multivariate_instantiation_asyneglog(self):
@@ -93,9 +93,9 @@ class TestUser(unittest.TestCase):
         with self.assertRaises(Exception):
             theta = 1.5  # wrong psi2
             AsyNegLog(theta=theta, psi1=psi1, psi2=psi2)
-        n_sample, dim, theta, psi1, psi2 = 1000, 2, 10, 0.5, 1.0
+        n_samples, dim, theta, psi1, psi2 = 1000, 2, 10, 0.5, 1.0
         anl1 = AsyNegLog(theta=theta, psi1=psi1, psi2=psi2,
-                         n_sample=n_sample, dim=dim)
+                         n_samples=n_samples, dim=dim)
         anl1.sample_unimargin()
 
     def test_multivariate_instantiation_asymix(self):
@@ -115,8 +115,8 @@ class TestUser(unittest.TestCase):
         with self.assertRaises(Exception):
             theta, psi1 = 0.2, 0.5  # third inequality is wrong
             AsyMix(theta=theta, psi1=psi1)
-        n_sample, dim, theta, psi1 = 1000, 2, 4/3, -1/3
-        am1 = AsyMix(theta=theta, psi1=psi1, n_sample=n_sample, dim=dim)
+        n_samples, dim, theta, psi1 = 1000, 2, 4/3, -1/3
+        am1 = AsyMix(theta=theta, psi1=psi1, n_samples=n_samples, dim=dim)
         am1.sample_unimargin()
 
     def test_multivariate_instantiation_tev(self):
@@ -134,9 +134,9 @@ class TestUser(unittest.TestCase):
             # not a symmetric matrix
             sigmat = np.array([[1, 0.7], [0.8, 1.0]])
             TEV(sigmat=sigmat, psi1=psi1)
-        n_sample, dim, sigmat, psi1 = 1000, 3, np.array(
+        n_samples, dim, sigmat, psi1 = 1000, 3, np.array(
             [[1, 0.8, 0.8], [0.8, 1.0, 0.8], [0.8, 0.8, 1.0]]), 0.2
-        tv1 = TEV(sigmat=sigmat, psi1=psi1, n_sample=n_sample, dim=dim)
+        tv1 = TEV(sigmat=sigmat, psi1=psi1, n_samples=n_samples, dim=dim)
         tv1.sample_unimargin()
 
     def test_multivariate_instantiation_dir(self):
@@ -155,9 +155,9 @@ class TestUser(unittest.TestCase):
             # wrong matrix
             sigmat = np.array([[1, 0.7], [0.8, 1.0]])
             Dirichlet(sigmat=sigmat, theta=theta, dim=3)
-        n_sample, dim, sigmat, theta = 1000, 3, np.array(
+        n_samples, dim, sigmat, theta = 1000, 3, np.array(
             [[2, 1, 1], [1, 2, 1], [1, 1, 2]]), np.array([1/3, 1/3, 1/3])
-        dr1 = Dirichlet(sigmat=sigmat, theta=theta, n_sample=n_sample, dim=dim)
+        dr1 = Dirichlet(sigmat=sigmat, theta=theta, n_samples=n_samples, dim=dim)
         dr1.sample_unimargin()
 
     def test_multivariate_instantiation_bilog(self):
@@ -171,8 +171,8 @@ class TestUser(unittest.TestCase):
         with self.assertRaises(Exception):
             theta = np.array([1.2, 0.3, 0.8, 0.9])  # wrong psi1
             Bilog(theta=theta, dim=4)
-        n_sample, dim, theta = 1000, 4, np.array([0.5, 0.3, 0.8, 0.9])
-        bl1 = Bilog(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 4, np.array([0.5, 0.3, 0.8, 0.9])
+        bl1 = Bilog(theta=theta, dim=dim, n_samples=n_samples)
         bl1.sample_unimargin()
 
 

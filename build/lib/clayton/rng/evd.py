@@ -60,7 +60,7 @@ class Logistic(Extreme):
     def __init__(
         self,
         theta=None,
-        n_sample=1,
+        n_samples=1,
         dim=2
     ):
         """Instantiate Logistic class
@@ -68,7 +68,7 @@ class Logistic(Extreme):
         Args:
             theta (float):
                 parameter between 0 and 1.
-            n_sample (int):
+            n_samples (int):
                 sample size.
             dim (int):
                 dimension
@@ -79,7 +79,7 @@ class Logistic(Extreme):
         """
 
         super().__init__(
-            n_sample=n_sample,
+            n_samples=n_samples,
             dim=dim
         )
         self.theta = theta
@@ -147,12 +147,12 @@ class Logistic(Extreme):
         """Algorithm 2.1 of Stephenson (2002).
 
         Returns:
-            ndarray of shape (n_sample, dim):
+            ndarray of shape (n_samples, dim):
                 Logistic dependence with Fréchet margins.
         """
 
-        sim = np.zeros(self.n_sample * self.dim)
-        for i in range(0, self.n_sample):
+        sim = np.zeros(self.n_samples * self.dim)
+        for i in range(0, self.n_samples):
             rps = rpstable(self.theta)
             for j in range(0, self.dim):
                 sim[i*self.dim + j] = math.exp(self.theta *
@@ -163,12 +163,12 @@ class Logistic(Extreme):
         """Draws a sample from a multivariate Logistic model with uniform margins.
 
         Returns:
-            ndarray of shape (n_sample, dim):
+            ndarray of shape (n_samples, dim):
                 Logistic dependence with uniform margins.
         """
 
         sim = _frechet(self._rmvlog_tawn())
-        return sim.reshape(self.n_sample, self.dim)
+        return sim.reshape(self.n_samples, self.dim)
 
 
 class AsymmetricLogistic(Extreme):
@@ -196,7 +196,7 @@ class AsymmetricLogistic(Extreme):
     def __init__(
         self,
         theta=None,
-        n_sample=1,
+        n_samples=1,
         dim=2,
         asy=None
     ):
@@ -205,7 +205,7 @@ class AsymmetricLogistic(Extreme):
         Args:
             theta (float, optional):
                 parameter of the copula. Defaults to None.
-            n_sample (int, optional):
+            n_samples (int, optional):
                 sample size. Defaults to 1.
             dim (int, optional):
                 dimension. Defaults to 2.
@@ -214,7 +214,7 @@ class AsymmetricLogistic(Extreme):
         """
 
         super().__init__(
-            n_sample=n_sample,
+            n_samples=n_samples,
             dim=dim
         )
         self.theta = theta
@@ -293,15 +293,15 @@ class AsymmetricLogistic(Extreme):
                 transformed asymmetry coefficients
 
         Returns:
-            ndarray with shape (n_sample, dim):
+            ndarray with shape (n_samples, dim):
              Asymmetric Logistic with Fréchet margins.
 
         """
 
-        sim = np.zeros(self.n_sample*self.dim)
+        sim = np.zeros(self.n_samples*self.dim)
         gevsim = np.zeros(number*self.dim)
         maxsim = np.zeros(number)
-        for i in range(0, self.n_sample):
+        for i in range(0, self.n_samples):
             for j in range(0, number):
                 if alpha[j] != 1:
                     rps = rpstable(alpha[j])
@@ -387,7 +387,7 @@ class HuslerReiss(Extreme):
     def __init__(
         self,
         sigmat=None,
-        n_sample=1,
+        n_samples=1,
         dim=2
     ):
         """Instantiate HuslerReiss copula model
@@ -395,14 +395,14 @@ class HuslerReiss(Extreme):
         Args:
             sigmat (ndarray, optional):
                 ndarray with shape (dim,dim). Defaults to None.
-            n_sample (int, optional):
+            n_samples (int, optional):
                 sample size. Defaults to 1.
             dim (int, optional):
                 dimension. Defaults to 2.
         """
 
         super().__init__(
-            n_sample=n_sample,
+            n_samples=n_samples,
             dim=dim
         )
         self.sigmat = sigmat
@@ -524,7 +524,7 @@ class HuslerReiss(Extreme):
                 the Cholesky root of sigmat
 
         Returns:
-            ndarray with shape (n_sample, dim):
+            ndarray with shape (n_samples, dim):
                 sample from an HuslerReiss copula with Fréchet margins.
         """
 
@@ -566,7 +566,7 @@ class AsyNegLog(Extreme):
         theta=None,
         psi1=None,
         psi2=None,
-        n_sample=1,
+        n_samples=1,
         dim=2
     ):
         """Instantiate the asymmetric negatic logistic copula model.
@@ -578,13 +578,13 @@ class AsyNegLog(Extreme):
                 first coefficient of asymmetry. Defaults to None.
             psi2 (float, optional):
                 second coefficient of asymmetry. Defaults to None.
-            n_sample (int, optional):
+            n_samples (int, optional):
                 sample size. Defaults to 1.
             dim (int, optional):
                 dimension. Defaults to 2.
         """
         super().__init__(
-            n_sample=n_sample,
+            n_samples=n_samples,
             dim=dim
         )
         self.theta = theta
@@ -679,7 +679,7 @@ class AsyMix(Extreme):
         self,
         theta=None,
         psi1=None,
-        n_sample=1,
+        n_samples=1,
         dim=2
     ):
         """Instantiate AsyMix copula model.
@@ -689,13 +689,13 @@ class AsyMix(Extreme):
                 parameter of the copula. Defaults to None.
             psi1 (float, optional):
                 parameter of asymmetry. Defaults to None.
-            n_sample (int, optional):
+            n_samples (int, optional):
                 sample size. Defaults to 1.
             dim (int, optional):
                 dimension. Defaults to 2.
         """
         super().__init__(
-            n_sample=n_sample,
+            n_samples=n_samples,
             dim=dim
         )
 
@@ -785,7 +785,7 @@ class TEV(Extreme):
         self,
         sigmat=None,
         psi1=None,
-        n_sample=1,
+        n_samples=1,
         dim=2
     ):
         """Instantiate TEV copula model.
@@ -795,13 +795,13 @@ class TEV(Extreme):
                 ndarray of shape (dim,dim). Defaults to None.
             psi1 (float, optional):
                 positive float. Defaults to None.
-            n_sample (int, optional):
+            n_samples (int, optional):
                 sample size. Defaults to 1.
             dim (int, optional):
                 dimension. Defaults to 2.
         """
         super().__init__(
-            n_sample=n_sample,
+            n_samples=n_samples,
             dim=dim
         )
 
@@ -914,7 +914,7 @@ class TEV(Extreme):
                 the Cholesky root of sigmat
 
         Returns:
-            ndarray with shape (n_sample, dim):
+            ndarray with shape (n_samples, dim):
                 sample from an HuslerReiss copula with Fréchet margins.
 
         https://github.com/lbelzile/mev/blob/main/src/sampling.cpp
@@ -949,7 +949,7 @@ class Dirichlet(Extreme):
         self,
         sigmat=None,
         theta=None,
-        n_sample=1,
+        n_samples=1,
         dim=2
     ):
         """Instantiate Dirichlet mixture model.
@@ -960,13 +960,13 @@ class Dirichlet(Extreme):
                 Defaults to None.
             theta (float, optional):
                 list of positive float, sum to 1. Defaults to None.
-            n_sample (int, optional):
+            n_samples (int, optional):
                 sample size. Defaults to 1.
             dim (int, optional):
                 dimension. Defaults to 2.
         """
         super().__init__(
-            n_sample=n_sample,
+            n_samples=n_samples,
             dim=dim
         )
 
@@ -1029,7 +1029,7 @@ class Bilog(Extreme):
     def __init__(
             self,
             theta=None,
-            n_sample=1,
+            n_samples=1,
             dim=2
     ):
         """Instantiate Bilog model
@@ -1037,13 +1037,13 @@ class Bilog(Extreme):
         Args:
             theta (ndarray, optional):
                 parameter of the model. Defaults to None.
-            n_sample (int, optional):
+            n_samples (int, optional):
                 sample size. Defaults to 1.
             dim (int, optional):
                 dimension. Defaults to 2.
         """
         super().__init__(
-            n_sample=n_sample,
+            n_samples=n_samples,
             dim=dim
         )
         self.theta = theta
@@ -1078,7 +1078,7 @@ class Bilog(Extreme):
                 code{theta}. Defaults to True.
 
         Returns:
-            ndarray with shape (n_sample, dim):
+            ndarray with shape (n_samples, dim):
                 Bilogistic random numbers with Fréchet margins.
         """
         alpha_star = np.ones(self.dim)

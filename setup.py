@@ -12,7 +12,7 @@ setup_requires = [
 
 setup(
     name = 'clayton',
-    version = '0.0.2',  
+    version = '0.0.3',  
     description = 'Sampling from copulae',
     long_description=open('README.md', 'r').read(),
     author = 'Alexis Boulin',

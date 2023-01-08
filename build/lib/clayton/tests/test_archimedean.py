@@ -33,13 +33,13 @@ class TestUser(unittest.TestCase):
             Clayton(theta=-5)
         with self.assertRaises(Exception):
             # can't sample from negative theta where dim > 2
-            cla1 = Clayton(theta=-2, dim=3, n_sample=1000)
+            cla1 = Clayton(theta=-2, dim=3, n_samples=1000)
             cla1.sample_unimargin()
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 100, 0.5
-        cla1 = Clayton(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 100, 0.5
+        cla1 = Clayton(theta=theta, dim=dim, n_samples=n_samples)
         cla1.sample_unimargin()
 
     def test_multivariate_instantiation_frank(self):
@@ -54,13 +54,13 @@ class TestUser(unittest.TestCase):
             Frank(theta=0.0)
         with self.assertRaises(Exception):
             # can't sample from negative theta where dim > 2
-            fra1 = Frank(theta=-2, dim=3, n_sample=1000)
+            fra1 = Frank(theta=-2, dim=3, n_samples=1000)
             fra1.sample_unimargin()
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 100, 0.5
-        fra1 = Frank(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 100, 0.5
+        fra1 = Frank(theta=theta, dim=dim, n_samples=n_samples)
         fra1.sample_unimargin()
 
     def test_multivariate_instantiation_amh(self):
@@ -75,13 +75,13 @@ class TestUser(unittest.TestCase):
             Amh(theta=-5.0)
         with self.assertRaises(Exception):
             # can't sample from negative theta where dim > 2
-            amh1 = Amh(theta=-0.5, dim=3, n_sample=1000)
+            amh1 = Amh(theta=-0.5, dim=3, n_samples=1000)
             amh1.sample_unimargin()
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 100, 0.5
-        amh1 = Amh(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 100, 0.5
+        amh1 = Amh(theta=theta, dim=dim, n_samples=n_samples)
         amh1.sample_unimargin()
 
     def test_multivariate_instantiation_joe(self):
@@ -97,8 +97,8 @@ class TestUser(unittest.TestCase):
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 100, 2
-        joe1 = Joe(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 100, 2
+        joe1 = Joe(theta=theta, dim=dim, n_samples=n_samples)
         joe1.sample_unimargin()
 
     def test_multivariate_instantiation_nelsen9(self):
@@ -114,8 +114,8 @@ class TestUser(unittest.TestCase):
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 2, 0.5
-        nel9 = Nelsen9(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 2, 0.5
+        nel9 = Nelsen9(theta=theta, dim=dim, n_samples=n_samples)
         nel9.sample_unimargin()
 
     def test_multivariate_instantiation_nelsen10(self):
@@ -131,8 +131,8 @@ class TestUser(unittest.TestCase):
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 2, 0.5
-        nel10 = Nelsen10(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 2, 0.5
+        nel10 = Nelsen10(theta=theta, dim=dim, n_samples=n_samples)
         nel10.sample_unimargin()
 
     def test_multivariate_instantiation_nelsen11(self):
@@ -148,8 +148,8 @@ class TestUser(unittest.TestCase):
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 2, 0.4
-        nel11 = Nelsen11(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 2, 0.4
+        nel11 = Nelsen11(theta=theta, dim=dim, n_samples=n_samples)
         nel11.sample_unimargin()
 
     def test_multivariate_instantiation_nelsen12(self):
@@ -164,13 +164,13 @@ class TestUser(unittest.TestCase):
             Nelsen12(theta=-5.0)
         with self.assertRaises(Exception):
             # can't sample from where dim > 2
-            nel12 = Nelsen12(theta=0.5, dim=3, n_sample=1000)
+            nel12 = Nelsen12(theta=0.5, dim=3, n_samples=1000)
             nel12.sample_unimargin()
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 2, 0.5
-        nel12 = Nelsen12(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 2, 0.5
+        nel12 = Nelsen12(theta=theta, dim=dim, n_samples=n_samples)
         nel12.sample_unimargin()
 
     def test_multivariate_instantiation_nelsen13(self):
@@ -185,13 +185,13 @@ class TestUser(unittest.TestCase):
             Nelsen13(theta=-5.0)
         with self.assertRaises(Exception):
             # can't sample from where dim > 2
-            nel13 = Nelsen13(theta=0.5, dim=3, n_sample=1000)
+            nel13 = Nelsen13(theta=0.5, dim=3, n_samples=1000)
             nel13.sample_unimargin()
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 2, 0.5
-        nel13 = Nelsen13(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 2, 0.5
+        nel13 = Nelsen13(theta=theta, dim=dim, n_samples=n_samples)
         nel13.sample_unimargin()
 
     def test_multivariate_instantiation_nelsen14(self):
@@ -206,13 +206,13 @@ class TestUser(unittest.TestCase):
             Nelsen14(theta=1.0)
         with self.assertRaises(Exception):
             # can't sample from where dim > 2
-            nel14 = Nelsen14(theta=2.5, dim=3, n_sample=1000)
+            nel14 = Nelsen14(theta=2.5, dim=3, n_samples=1000)
             nel14.sample_unimargin()
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 2, 1.5
-        nel14 = Nelsen14(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 2, 1.5
+        nel14 = Nelsen14(theta=theta, dim=dim, n_samples=n_samples)
         nel14.sample_unimargin()
 
     def test_multivariate_instantiation_nelsen15(self):
@@ -227,13 +227,13 @@ class TestUser(unittest.TestCase):
             Nelsen15(theta=-0.5)
         with self.assertRaises(Exception):
             # can't sample from where dim > 2
-            nel15 = Nelsen15(theta=2.5, dim=3, n_sample=1000)
+            nel15 = Nelsen15(theta=2.5, dim=3, n_samples=1000)
             nel15.sample_unimargin()
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 2, 1.5
-        nel15 = Nelsen15(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 2, 1.5
+        nel15 = Nelsen15(theta=theta, dim=dim, n_samples=n_samples)
         nel15.sample_unimargin()
 
     def test_multivariate_instantiation_nelsen22(self):
@@ -248,13 +248,13 @@ class TestUser(unittest.TestCase):
             Nelsen22(theta=1.5)
         with self.assertRaises(Exception):
             # can't sample from where dim > 2
-            nel22 = Nelsen22(theta=0.75, dim=3, n_sample=1000)
+            nel22 = Nelsen22(theta=0.75, dim=3, n_samples=1000)
             nel22.sample_unimargin()
 
         # sampling test
 
-        n_sample, dim, theta = 1000, 2, 0.5
-        nel22 = Nelsen22(theta=theta, dim=dim, n_sample=n_sample)
+        n_samples, dim, theta = 1000, 2, 0.5
+        nel22 = Nelsen22(theta=theta, dim=dim, n_samples=n_samples)
         nel22.sample_unimargin()
 
 

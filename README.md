@@ -8,6 +8,8 @@ applied fields of science. To this aim the copula function can be used as a marg
 
 The module clayton is implemented using the object-oriented features of the Python language. The classes are designed for Archimedean, elliptical, extreme value copulae. Each contains methods to generate random vectors.
 
+For more information, the reader can access the paper describing the code, which was accepted for publication in computo, at the following URL: https://aleboul.github.io/computo/.
+
 ## Installation
 
 ### Dependencies
