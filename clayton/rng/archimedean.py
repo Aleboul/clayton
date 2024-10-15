@@ -55,7 +55,7 @@ class Clayton(Archimedean):
         Returns:
             float.
         """
-        return (1.0 / self.theta) * (np.power(var, -self.theta) - 1)
+        return (np.power(var, -self.theta) - 1)
 
     def _generator_inv(self, var):
         """Return the generator inverse.
@@ -68,7 +68,7 @@ class Clayton(Archimedean):
         Returns:
             float
         """
-        return np.power((1.0 + self.theta*var), -1/self.theta)
+        return np.power((1.0 + var), -1/self.theta)
 
     def _generator_dot(self, var):
         """Return the derivative of the generator function
@@ -81,7 +81,7 @@ class Clayton(Archimedean):
         Returns:
             float
         """
-        return -np.power(var, -self.theta-1)
+        return -self.theta*np.power(var, -self.theta-1)
 
     def _rfrailty(self):
         """Sample from frailty distribution, a Gamma
