@@ -13,6 +13,12 @@ class Gaussian(Multivariate):
 
     copula_type = CopulaTypes.GAUSSIAN
 
+    def __init__(self, n_samples = 1, dim=2, sigma = np.array([1,0],[0,1])):
+        super().__init__(n_samples=n_samples,
+            dim=dim)
+        self.sigmat = sigma
+        self.is_pos_def()
+    
     def is_pos_def(self):
         """Validate the Sigma inserted.
 
@@ -28,7 +34,7 @@ class Gaussian(Multivariate):
         """Set margins as uniform under the segment [0,1].
         """
         self.is_pos_def()
-        mean = np.zeros(self.d)
+        mean = np.zeros(self.dim)
         sample = np.random.multivariate_normal(
             mean=mean, cov=self.sigmat, size=self.n_samples)
         return norm.cdf(sample)
@@ -60,9 +66,9 @@ class Student(Multivariate):
         Produce n_samples samples of d-dimensional multivariate t distribution
         '''
         gamma = np.tile(np.random.gamma(self.theta/2., 2. /
-                        self.theta, self.n_samples), (self.d, 1)).T
+                        self.theta, self.n_samples), (self.dim, 1)).T
         normobs = np.random.multivariate_normal(
-            np.zeros(self.d), self.Sigma, self.n_samples)
+            np.zeros(self.dim), self.Sigma, self.n_samples)
         return normobs/np.sqrt(gamma)
 
     def sample_unimargin(self):
