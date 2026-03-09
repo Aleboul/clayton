@@ -18,6 +18,9 @@ class Gaussian(Multivariate):
             dim=dim)
         self.sigmat = sigma
         self.is_pos_def()
+        if self.sigmat.shape[0]:
+            message = "The covariance matrix shape {} does not match with vector dimension {}"
+            raise ValueError(message.format(self.sigmat.shape, dim))
     
     def is_pos_def(self):
         """Validate the Sigma inserted.
