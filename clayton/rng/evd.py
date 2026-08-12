@@ -504,14 +504,14 @@ class HuslerReiss(Extreme):
                 a matrix positive definite
          """
 
-        others = np.delete(np.arange(self.dim), index)
+        I = np.delete(np.arange(self.dim), index)
 
-        gamma = self.sigmat[index, others]
+        gamma = self.sigmat[index, I]
 
         covar = (
             gamma[:, None]
             + gamma[None, :]
-            - self.sigmat[np.ix_(others, others)]
+            - self.sigmat[np.ix_(I, I)]
         )
 
         return covar
@@ -531,7 +531,7 @@ class HuslerReiss(Extreme):
                     sample from an HuslerReiss copula with Fréchet margins.
             """
     
-            I = [i for i in range(self.dim) if i != index]
+            I = np.delete(np.arange(self.dim), index)
 
             # Sample Gaussian increments using precomputed Cholesky
 
