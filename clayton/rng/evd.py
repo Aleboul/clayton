@@ -156,7 +156,7 @@ class Logistic(Extreme):
             rps = rpstable(self.theta)
             for j in range(0, self.dim):
                 sim[i*self.dim + j] = math.exp(self.theta *
-                                               (rps - math.log(np.random.exponential(size=1))))
+                                               (rps - math.log(np.random.exponential())))
         return sim
 
     def sample_unimargin(self):
@@ -311,7 +311,7 @@ class AsymmetricLogistic(Extreme):
                     if asy[j*self.dim+k] != 0:
                         gevsim[j*self.dim+k] = asy[j*self.dim+k] * \
                             math.exp(
-                                alpha[j] * (rps - math.log(np.random.exponential(size=1))))
+                                alpha[j] * (rps - math.log(np.random.exponential())))
 
             for j in range(0, self.dim):
                 for k in range(0, number):
@@ -494,50 +494,59 @@ class HuslerReiss(Extreme):
     def _sigma2covar(self, index):
         """Transform positive definite covariance matrix to a
         conditionally negative definite matrix (see Engelke and Hitz, 2020 Appendix B).
-
+ 
         Args:
             index (int):
                 index of the location. An integer in {0, ..., d-1}
-
+ 
         Returns:
             ndarray of shape (dim,dim):
                 a matrix positive definite
-        """
+         """
 
-        covar = 0.5 * (np.repeat(self.sigmat[:, index], self.sigmat.shape[0]).reshape(
-            self.sigmat.shape[0],
-            self.sigmat.shape[0]) +
-            np.repeat(self.sigmat[index, :], self.sigmat.shape[1]).reshape(
-                self.sigmat.shape[0], self.sigmat.shape[0], order='F') - self.sigmat)
-        covar = np.delete(covar, index, axis=0)
-        covar = np.delete(covar, index, axis=1)
+        others = np.delete(np.arange(self.dim), index)
+
+        gamma = self.sigmat[index, others]
+
+        covar = (
+            gamma[:, None]
+            + gamma[None, :]
+            - self.sigmat[np.ix_(others, others)]
+        )
+
         return covar
 
     def _rextfunc(self, index, cholesky):
-        """ Generate from extremal Husler-Reiss distribution Y follows P_x, where
-        P_x is probability of extremal function
+            """ Generate from extremal Husler-Reiss distribution Y follows P_x, where
+            P_x is probability of extremal function
+    
+            Args:
+                index (int):
+                    index of the location. An integer in {0, ..., d-1}.
+                cholesky (ndarray):
+                    the Cholesky root of sigmat
+    
+            Returns:
+                ndarray with shape (n_samples, dim):
+                    sample from an HuslerReiss copula with Fréchet margins.
+            """
+    
+            I = [i for i in range(self.dim) if i != index]
 
-        Args:
-            index (int):
-                index of the location. An integer in {0, ..., d-1}.
-            cholesky (ndarray):
-                the Cholesky root of sigmat
+            # Sample Gaussian increments using precomputed Cholesky
 
-        Returns:
-            ndarray with shape (n_samples, dim):
-                sample from an HuslerReiss copula with Fréchet margins.
-        """
+            z = np.random.normal(size=(self.dim-1))
+            D_I = cholesky @ z # D_I ~ N(0, C)
 
-        gamma = self.sigmat[:, index] / 2
-        gamma = np.delete(gamma, index)
-        normalsamp = mvrnorm_chol_arma(1, gamma, cholesky)
+            D = np.zeros(self.dim)
+            for idx, i in enumerate(I):
+                D[i] = D_I[idx]
 
-        indexentry = 0
-        normalsamp = np.insert(normalsamp, index, indexentry)
-        gamma = np.insert(gamma, index, indexentry)
-        samp = np.exp(normalsamp)
-        samp[index] = 1.0
-        return samp
+            # Y_i = exp(D_i - Gamma[i,J])
+            samp = np.exp(D - 0.5*self.sigmat[:, index])
+    
+            return samp
+    
 
 
 class AsyNegLog(Extreme):
@@ -813,19 +822,37 @@ class TEV(Extreme):
 
     def _check_param(self):
         """Check sigmat and psi1.
-
+    
         Raises:
             ValueError: psi1 should be positive.
-            ValueError: sigmat should be a squared matrix.
+            ValueError: sigmat should be a correlation matrix.
         """
+        # Check psi1
         if self.psi1 <= 0:
-            message = "The parameter {} should be a positive quantity for \
-                the {} copula."
+            message = "The parameter {} should be a positive quantity for the {} copula."
             raise ValueError(message.format(self.psi1, self.copula_type))
+    
+        # Check sigmat
         if isinstance(self.sigmat, np.ndarray):
-            if (not self.sigmat.shape[0] == self.sigmat.shape[1] or
-                    not np.allclose(self.sigmat, self.sigmat.T)):
-                message = "{} should be a squared matrix"
+            # Check if sigmat is a square matrix
+            if not (self.sigmat.shape[0] == self.sigmat.shape[1]):
+                message = "{} should be a square matrix."
+                raise ValueError(message.format(self.sigmat))
+    
+            # Check if sigmat is symmetric
+            if not np.allclose(self.sigmat, self.sigmat.T):
+                message = "{} should be a symmetric matrix."
+                raise ValueError(message.format(self.sigmat))
+    
+            # Check if diagonal elements are 1
+            if not np.allclose(np.diag(self.sigmat), 1):
+                message = "{} should have ones on the diagonal."
+                raise ValueError(message.format(self.sigmat))
+    
+            # Check if sigmat is positive semi-definite
+            eigenvalues = np.linalg.eigvalsh(self.sigmat)
+            if not np.all(eigenvalues >= -1e-8):  # Allow for small numerical errors
+                message = "{} should be a positive semi-definite matrix."
                 raise ValueError(message.format(self.sigmat))
 
     def _ztev(self, var):
@@ -1013,9 +1040,9 @@ class Dirichlet(Extreme):
         m = np.random.choice(int_seq, 1, False, weights)[0]
 
         sample = np.zeros(self.dim)
-        gzero = np.random.gamma(self.sigmat[index, m] + 1.0, 1.0, size=1)
+        gzero = np.random.gamma(self.sigmat[index, m] + 1.0, 1.0)
         for j in range(0, self.dim):
-            sample[j] = np.random.gamma(self.sigmat[j, m], 1.0, size=1) / gzero
+            sample[j] = np.random.gamma(self.sigmat[j, m], 1.0) / gzero
         sample[index] = 1.0
         return sample
 
@@ -1051,14 +1078,20 @@ class Bilog(Extreme):
             self._check_param()
 
     def _check_param(self):
-        """Check parameter theta
-
+        """Check parameter theta.
+    
         Raises:
             ValueError:
-                invalid argument for theta
+                Invalid argument for theta.
         """
+        if not isinstance(self.theta, np.ndarray) or self.theta.ndim != 1:
+            raise ValueError("theta must be a one-dimensional NumPy array")
+    
+        if self.theta.shape[0] != self.dim:
+            raise ValueError("theta must have length self.dim")
+    
         if np.any((self.theta < 0.0) | (self.theta > 1.0)):
-            raise ValueError('invalid argument for theta')
+            raise ValueError("invalid argument for theta")
 
     def _pickands(self, var):
         raise NotImplementedError

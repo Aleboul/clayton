@@ -32,17 +32,23 @@ def subsets(d):
 
 
 def rpstable(cexp):
-    """Sample from a Positive Stable distribution.
-    """
+    """Sample from a Positive Stable distribution."""
+
     if cexp == 1:
         return 0
-    tcexp = 1-cexp
-    u = np.random.uniform(size=1) * math.pi
-    w = math.log(np.random.exponential(size=1))
-    a = math.log(math.sin(tcexp*u)) + (cexp / tcexp) * \
-        math.log(math.sin(cexp*u)) - (1/tcexp) * math.log(math.sin(u))
-    return (tcexp / cexp) * (a-w)
 
+    tcexp = 1 - cexp
+
+    u = np.random.uniform() * math.pi
+    w = math.log(np.random.exponential())
+
+    a = (
+        math.log(math.sin(tcexp * u))
+        + (cexp / tcexp) * math.log(math.sin(cexp * u))
+        - (1 / tcexp) * math.log(math.sin(u))
+    )
+
+    return (tcexp / cexp) * (a - w)
 
 def mvrnorm_chol_arma(n, mu, chol_cov):
     """ Set all the elements to random values using
@@ -57,12 +63,14 @@ def mvrnorm_chol_arma(n, mu, chol_cov):
         extremal distribution of the Husler-Reiss
     """
 
-    Y = np.random.normal(size=chol_cov.shape[0]).reshape(
-        (n, chol_cov.shape[0]))
-    samp = (Y @ chol_cov).reshape((n, chol_cov.shape[0]))
-    samp = samp - mu
-    return np.squeeze(np.asarray(samp))
+    d = chol_cov.shape[0]
 
+    Y = np.random.normal(size=(n, d))
+
+    samp = Y @ chol_cov.T
+    samp -= mu
+
+    return samp
 
 def rdir(n, alpha, normalize=True):
     """ Random variate generation for Dirichlet distribution on eqn{S_{d}}{Sd}
@@ -117,7 +125,7 @@ def simplex(d, n=50, a=0, b=1):
 
 
 def rSibuya(alpha, gamma_1_a):
-    U = np.random.uniform(0.0, 1.0, 1)
+    U = np.random.uniform(0.0, 1.0)
     if (U <= alpha):
         return 1.0
     else:

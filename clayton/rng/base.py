@@ -574,7 +574,7 @@ class Extreme(Multivariate):
             zeta = np.random.exponential(1)
             if self.copula_type in matsim:
                 covar = self._sigma2covar(0)
-                cholesky = np.linalg.cholesky(covar).T
+                cholesky = np.linalg.cholesky(covar)
                 extfunc = self._rextfunc(0, cholesky)
             if self.copula_type in dirlog:
                 extfunc = self._rextfunc(0)
@@ -585,7 +585,7 @@ class Extreme(Multivariate):
                 zeta = np.random.exponential(1)
                 if self.copula_type in matsim:
                     covar = self._sigma2covar(j)
-                    cholesky = np.linalg.cholesky(covar).T
+                    cholesky = np.linalg.cholesky(covar)
 
                 while (1.0 / zeta > output[i, j]):
                     if self.copula_type in matsim:
@@ -593,12 +593,10 @@ class Extreme(Multivariate):
                     if self.copula_type in dirlog:
                         extfunc = self._rextfunc(j)
                     res = True
-                    for k in range(0, j):
-                        if (extfunc[k] / zeta >= output[i, k]):
-                            res = False
-
-                    if res:
-                        output[i, :] = np.maximum(output[i, :], extfunc / zeta)
+                    # Check if this function is subextremal at previous locations
+                    # i.e., ζ^{-1} * Y[i] < Z[i] for all i < n
+                    if np.all(extfunc[:j] / zeta < output[i, :j]):
+                        output[i,:] = np.maximum(output[i, :], extfunc / zeta)
                     zeta += np.random.exponential(1)
 
         return output

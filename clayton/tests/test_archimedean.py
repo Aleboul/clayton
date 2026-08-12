@@ -17,6 +17,7 @@ from clayton.rng.archimedean import Nelsen15
 from clayton.rng.archimedean import Nelsen22
 
 
+
 class TestUser(unittest.TestCase):
     """A simple test class for evd copula
     """
