@@ -14,7 +14,7 @@ For more information, the reader can access the paper describing the code, which
 
 ### Dependencies
 
-COPPY requires :
+clayton requires :
 
 - Python (>= 3.7)
 - NumPY (>= 1.14.6)
